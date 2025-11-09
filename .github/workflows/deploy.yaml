@@ -1,0 +1,15 @@
+name: Trigger Coolify Deploy
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Coolify build
+        run: |
+          echo "Triggering Coolify deploy for tag ${{ github.ref_name }}"
+          curl -X POST -d "" ${{ secrets.COOLIFY_DEPLOY_HOOK }}
