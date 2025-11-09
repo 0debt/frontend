@@ -1,15 +1,17 @@
-name: Trigger Coolify Deploy
+name: Deploy to Coolify (Authenticated)
 
 on:
   push:
     tags:
-      - 'v*'
+      - 'v*'    # Se ejecuta solo cuando creas un nuevo tag: v1.0.0, v2.3.1, etc.
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Trigger Coolify build
+      - name: Trigger authenticated deployment to Coolify
         run: |
-          echo "Triggering Coolify deploy for tag ${{ github.ref_name }}"
-          curl -X POST -d "" ${{ secrets.COOLIFY_DEPLOY_HOOK }}
+          echo "Iniciado despliegue de versión ${{ github.ref_name }} a Coolify..."
+          curl -X POST -d "" \
+          -H "Authorization: Bearer ${{ secrets.COOLIFY_API_KEY }}" \
+          "${{ secrets.COOLIFY_DEPLOY_HOOK }}"
