@@ -1,13 +1,12 @@
 # Fase 1: Base - Usamos la imagen oficial de Bun
-FROM oven/bun:1-alpine AS base
-# Instala compatibilidad para dependencias nativas (buena práctica)
-RUN apk add --no-cache libc6-compat
+FROM oven/bun:1 AS base
+
 WORKDIR /app
 
 # Fase 2: Instalación de dependencias - Usamos bun install
 FROM base AS deps
-COPY package.json bun.lockb* package-lock.json* ./
-RUN bun install --frozen-lockfile
+COPY package.json bun.lockb* ./
+RUN bun install --no-save --frozen-lockfile
 
 # Fase 3: Build de la aplicación - Usamos bun run build
 FROM base AS builder
@@ -39,5 +38,5 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# Ejecuta el servidor optimizado de Next.js usando el script "start" de package.json
-CMD ["bun", "start"]
+# Ejecuta el servidor standalone con Bun
+CMD ["bun", "./server.js"]
