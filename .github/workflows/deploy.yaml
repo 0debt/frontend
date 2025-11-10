@@ -12,6 +12,8 @@ jobs:
       - name: Trigger authenticated deployment to Coolify
         run: |
           echo "Iniciado despliegue de versión ${{ github.ref_name }} a Coolify..."
-          curl -X POST -d "" \
-          -H "Authorization: Bearer ${{ secrets.COOLIFY_API_KEY }}" \
-          "${{ secrets.COOLIFY_DEPLOY_HOOK }}"
+          curl -X POST \
+            -H "Authorization: Bearer ${{ secrets.COOLIFY_API_KEY }}" \
+            -H "Content-Type: application/json" \
+            -d '{"branch": "main", "ref": "${{ github.ref }}", "repository": {"full_name": "${{ github.repository }}"}}' \
+            "${{ secrets.COOLIFY_DEPLOY_HOOK }}"
