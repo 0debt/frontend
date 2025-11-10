@@ -14,6 +14,4 @@ jobs:
           echo "Iniciado despliegue de versión ${{ github.ref_name }} a Coolify..."
           curl -X POST \
             -H "Authorization: Bearer ${{ secrets.COOLIFY_API_KEY }}" \
-            -H "Content-Type: application/json" \
-            -d '{"branch": "main", "ref": "${{ github.ref }}", "repository": {"full_name": "${{ github.repository }}"}}' \
             "${{ secrets.COOLIFY_DEPLOY_HOOK }}"
