@@ -5,7 +5,7 @@ WORKDIR /app
 
 # Fase 2: Instalación de dependencias - Usamos bun install
 FROM base AS deps
-COPY package.json bun.lockb* ./
+COPY package.json bun.lock* ./
 RUN bun install --no-save --frozen-lockfile
 
 # Fase 3: Build de la aplicación - Usamos bun run build
