@@ -1,0 +1,6 @@
+{
+  "editor.foldingImportsByDefault": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "always"
+  }
+}
