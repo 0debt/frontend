@@ -1,4 +1,4 @@
-# Contributing guide
+# Guía de contribución al Frontend
 
 Este documento explica la arquitectura, estructura y cómo contribuir al proyecto frontend.
 
