@@ -1,5 +1,7 @@
 import { Card, CardDescription, CardHeader, CardTitle } from '@/shadcn/components/ui/card'
 
+import { LoadingDemo } from '@/app/components/LoadingDemo'
+
 export default function DocsPage() {
   return (
     <main className="container mx-auto max-w-4xl px-4 py-12">
@@ -38,6 +40,10 @@ export default function DocsPage() {
           </CardHeader>
         </Card>
       </div>
+
+      <section className="mt-12">
+        <LoadingDemo />
+      </section>
     </main>
   )
 }
