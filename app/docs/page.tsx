@@ -1,6 +1,7 @@
 import { Card, CardDescription, CardHeader, CardTitle } from '@/shadcn/components/ui/card'
 
 import { LoadingDemo } from '@/app/components/LoadingDemo'
+import { SonnerDemo } from '@/app/components/SonnerDemo'
 
 export default function DocsPage() {
   return (
@@ -41,8 +42,9 @@ export default function DocsPage() {
         </Card>
       </div>
 
-      <section className="mt-12">
+      <section className="mt-12 space-y-8">
         <LoadingDemo />
+        <SonnerDemo />
       </section>
     </main>
   )

@@ -1,6 +1,7 @@
+import { Toaster } from "@/shadcn/components/ui/sonner";
 import type { Metadata } from "next";
-import "./globals.css";
 import { Header } from "./components/Header";
+import "./globals.css";
 
 export const metadata: Metadata = {
   title: "0debt",
@@ -20,6 +21,7 @@ export default function RootLayout({
           <Header />
           {children}
         </div>
+        <Toaster />
       </body>
     </html>
   );
