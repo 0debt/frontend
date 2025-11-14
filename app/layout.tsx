@@ -1,3 +1,4 @@
+import { ScrollArea } from "@/shadcn/components/ui/scroll-area";
 import { Toaster } from "@/shadcn/components/ui/sonner";
 import type { Metadata } from "next";
 import { Header } from "./components/Header";
@@ -17,10 +18,12 @@ export default function RootLayout({
     <html lang="en">
       <link rel="icon" href="/0debt-logo.svg" />
       <body className="antialiased">
-        <div className="flex min-h-screen flex-col">
-          <Header />
-          {children}
-        </div>
+        <ScrollArea className="h-screen">
+          <div className="flex min-h-screen flex-col">
+            <Header />
+            {children}
+          </div>
+        </ScrollArea>
         <Toaster />
       </body>
     </html>

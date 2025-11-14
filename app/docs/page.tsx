@@ -1,8 +1,5 @@
 import { Card, CardDescription, CardHeader, CardTitle } from '@/shadcn/components/ui/card'
 
-import { LoadingDemo } from '@/app/components/LoadingDemo'
-import { SonnerDemo } from '@/app/components/SonnerDemo'
-
 export default function DocsPage() {
   return (
     <main className="container mx-auto max-w-4xl px-4 py-12">
@@ -31,21 +28,7 @@ export default function DocsPage() {
             </CardDescription>
           </CardHeader>
         </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Guides</CardTitle>
-            <CardDescription>
-              Step-by-step guides to help you make the most of 0debt.
-            </CardDescription>
-          </CardHeader>
-        </Card>
       </div>
-
-      <section className="mt-12 space-y-8">
-        <LoadingDemo />
-        <SonnerDemo />
-      </section>
     </main>
   )
 }

@@ -1,11 +1,11 @@
 import { Loader2 } from "lucide-react"
 
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardHeader,
-    CardTitle,
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
 } from "@/shadcn/components/ui/card"
 import { Skeleton } from "@/shadcn/components/ui/skeleton"
 
@@ -20,7 +20,7 @@ export function LoadingDemo() {
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-8 md:flex-row">
-        <div className="flex flex-1 flex-col items-center gap-3 rounded-lg border bg-card p-6 text-center">
+        <div className="flex flex-1 flex-col items-center gap-3 rounded-lg border bg-card p-2 text-center">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
           <div>
             <p className="font-medium">Spinner</p>
