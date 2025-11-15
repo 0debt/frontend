@@ -1,6 +1,6 @@
 import { Button } from '@/shadcn/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shadcn/components/ui/card'
-import Link from 'next/link'
+import { Link } from 'next-view-transitions'
 
 export default function NotFound() {
   return (

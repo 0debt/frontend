@@ -37,6 +37,7 @@ Este proyecto utiliza **Next.js 16** con **App Router** (routing basado en archi
 - **shadcn/ui**: Componentes UI (ubicados en `shadcn/components/ui/`)
 - **Radix UI**: Primitivos accesibles (usado por shadcn/ui)
 - **Lucide React**: Iconos
+- **next-view-transitions**: Transiciones suaves entre páginas
 
 ### Desarrollo
 - **ESLint**: Linter
@@ -59,10 +60,17 @@ frontend/
 │   │   └── page.tsx
 │   ├── components/        # Componentes específicos de la app
 │   │   ├── Header.tsx
-│   │   └── MainNav.tsx
-│   ├── __tests__/         # Tests
-│   ├── layout.tsx         # Root layout (envolvente de toda la app)
-│   └── globals.css        # Estilos globales
+│   │   ├── MainNav.tsx
+│   │   ├── LoadingDemo.tsx
+│   │   ├── ScrollAreaDemo.tsx
+│   │   └── SonnerDemo.tsx
+│   ├── demo-components/  # /demo-components
+│   │   └── page.tsx
+│   ├── hooks/            # Custom hooks
+│   ├── __tests__/        # Tests
+│   ├── layout.tsx        # Root layout (envolvente de toda la app)
+│   ├── globals.css       # Estilos globales (incluye View Transitions)
+│   └── not-found.tsx     # Página 404
 ├── shadcn/                # Componentes shadcn/ui
 │   └── components/
 │       └── ui/            # Componentes UI reutilizables
@@ -169,6 +177,9 @@ Página: https://ui.shadcn.com/docs/components
 - `Card`
 - `Input`
 - `Label`
+- `ScrollArea`
+- `Skeleton`
+- `Sonner` (toast notifications)
 
 ### Usar componentes shadcn/ui
 
@@ -228,6 +239,7 @@ describe('My Feature', () => {
 - **Fuentes locales** en `public/fonts/` (más rápido que Google Fonts)
 - **`output: 'standalone'`** solo en producción (desarrollo más rápido)
 - **Server Components** por defecto (usa `'use client'` solo si necesitas hooks/eventos)
+- **View Transitions** para navegación fluida entre páginas
 
 ## 🚀 Comandos
 
@@ -256,12 +268,32 @@ import { cn } from '@/lib/utils'
 
 **shadcn/ui:** Componentes en `shadcn/components/ui/` (config en `components.json`)
 
+## 🎬 View Transitions
+
+El proyecto utiliza **View Transitions** para transiciones suaves entre páginas.
+
+**Importante**: Usa `Link` de `next-view-transitions` en lugar de `next/link`:
+
+```typescript
+// ✅ Correcto
+import { Link } from 'next-view-transitions'
+
+// ❌ Incorrecto
+import Link from 'next/link'
+```
+
+**Configuración:**
+- `ViewTransitions` envuelve la app en `app/layout.tsx`
+- Las animaciones están configuradas en `app/globals.css`
+- Duración: 0.25s con fade in/out suave
+
 ## 📝 Buenas prácticas
 
 - **Server Components primero** (usa `'use client'` solo si necesitas hooks/eventos)
 - **shadcn/ui** para componentes (no crear desde cero)
 - **TypeScript** en todo
-- **`next/image`** para imágenes, **`next/link`** para navegación
+- **`next/image`** para imágenes
+- **`Link` de `next-view-transitions`** para navegación (NO `next/link`)
 
 ## 📚 Recursos
 

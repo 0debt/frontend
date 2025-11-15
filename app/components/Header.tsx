@@ -3,7 +3,7 @@
 import { MainNav } from '@/app/components/MainNav'
 import { Button } from '@/shadcn/components/ui/button'
 import Image from 'next/image'
-import Link from 'next/link'
+import { Link } from 'next-view-transitions'
 import { usePathname } from 'next/navigation'
 
 export function Header() {
