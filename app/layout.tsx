@@ -17,7 +17,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <link rel="icon" href="/0debt-logo.svg" />
+      <head>
+        <link rel="icon" href="/0debt-logo.svg" />
+        <script defer src="https://cloud.umami.is/script.js" data-website-id="d87339d8-de0f-4030-a774-558fb5032c3e"></script>
+      </head>
       <body className="antialiased">
         <ViewTransitions>
           <ScrollArea className="h-screen">
