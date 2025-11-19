@@ -9,6 +9,8 @@ const navItems = [
   { href: '/dashboard', label: 'Dashboard' },
   { href: '/docs', label: 'Docs' },
   { href: '/demo-components', label: 'Demo Components' },
+  { href: '/plans', label: 'Plans' },
+
 ]
 
 export function MainNav() {
