@@ -2,6 +2,7 @@ import { Button } from '@/shadcn/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shadcn/components/ui/card'
 import { Input } from '@/shadcn/components/ui/input'
 import { Label } from '@/shadcn/components/ui/label'
+import Link from 'next/link'
 
 export default function SignInPage() {
   return (
@@ -34,6 +35,12 @@ export default function SignInPage() {
             <Button type="submit" className="w-full">
               Sign In
             </Button>
+            <div className="text-center text-sm">
+            Do not have an account?{' '}
+            <Link className="text-primary hover:underline" href="/sign-up">
+              Sign Up
+            </Link>
+          </div>
           </form>
         </CardContent>
       </Card>
