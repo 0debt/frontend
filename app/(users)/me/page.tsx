@@ -13,7 +13,6 @@ export default async function ProfilePage() {
       name: "sonia",
       email: "sonia@gmail.com",
       plan: "FREE",
-      createdAt: "1970-01-01T00:00:00.000Z",
     }
   } else {
     const cookieStore = await cookies()
@@ -67,13 +66,6 @@ export default async function ProfilePage() {
           <div className="flex justify-between">
             <span className="text-muted-foreground">Plan:</span>
             <span className="font-medium capitalize">{user.plan}</span>
-          </div>
-
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Created at:</span>
-            <span className="font-medium">
-              {new Date(user.createdAt).toLocaleDateString()}
-            </span>
           </div>
 
         </div>
