@@ -12,6 +12,7 @@ export default async function ProfilePage() {
     user = {
       name: "sonia",
       email: "sonia@gmail.com",
+      avatar: "https://api.dicebear.com/7.x/thumbs/svg?seed=sonia",
       plan: "FREE",
     }
   } else {
@@ -52,7 +53,11 @@ export default async function ProfilePage() {
         </CardHeader>
 
         <div className="p-6 space-y-4 text-sm">
-
+          <img
+            src={user.avatar}
+            alt={user.name}
+            className="w-20 h-20 rounded-full border shadow-sm"
+          />
           <div className="flex justify-between">
             <span className="text-muted-foreground">Name:</span>
             <span className="font-medium">{user.name}</span>
