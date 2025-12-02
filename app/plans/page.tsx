@@ -1,27 +1,27 @@
+import { fetchWithAuth } from "@/app/lib/api"
+import { isMockEnabled, MOCK_USER } from "@/app/lib/mock"
+import { getSession } from "@/app/lib/session"
 import { Button } from "@/shadcn/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shadcn/components/ui/card"
-import { cookies } from "next/headers"
-
-const MOCK = true
+import { redirect } from "next/navigation"
 
 export default async function PlansPage() {
-
   let user
 
-  if (MOCK) {
-    user = {
-      name: "Joserra",
-      email: "joserra@example.com",
-      plan: "FREE",
-    }
+  if (isMockEnabled) {
+    user = MOCK_USER
   } else {
-    const cookieStore = await cookies()
-    const token = cookieStore.get("auth_token")?.value
+    const session = await getSession()
 
-    const res = await fetch("https://api.0debt.xyz/users/me", {
-      headers: { Authorization: `Bearer ${token}` },
-      cache: "no-store",
-    })
+    if (!session) {
+      redirect("/sign-in")
+    }
+
+    const res = await fetchWithAuth("/users/me", { cache: "no-store" })
+
+    if (!res.ok) {
+      redirect("/sign-in")
+    }
 
     user = await res.json()
   }

@@ -1,37 +1,46 @@
+import { fetchWithAuth } from "@/app/lib/api"
+import { isMockEnabled, MOCK_USER } from "@/app/lib/mock"
+import { getSession } from "@/app/lib/session"
+import { logout } from "@/app/actions/auth"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/shadcn/components/ui/card"
-import { cookies } from "next/headers"
+import { Button } from "@/shadcn/components/ui/button"
+import Link from "next/link"
 import { redirect } from "next/navigation"
 
-// cambiar esto al integrar el microservicio!
-const MOCK = true
+type User = {
+  _id: string
+  name: string
+  email: string
+  avatar: string
+  plan: string
+}
 
 export default async function ProfilePage() {
-  let user
-  //datos de prueba
-  if (MOCK) {
-    user = {
-      name: "sonia",
-      email: "sonia@gmail.com",
-      avatar: "https://api.dicebear.com/7.x/thumbs/svg?seed=sonia",
-      plan: "FREE",
-    }
-  } else {
-    const cookieStore = await cookies()
-    const token = cookieStore.get("auth_token")?.value
+  let user: User
 
-    if (!token) {
+  if (isMockEnabled) {
+    user = MOCK_USER
+  } else {
+    const session = await getSession()
+
+    if (!session) {
       redirect("/sign-in")
     }
 
-    const res = await fetch("https://api.0debt.xyz/users/me", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+    const res = await fetchWithAuth("/users/me", {
       cache: "no-store",
     })
 
     if (res.status === 401) {
       redirect("/sign-in")
+    }
+
+    if (!res.ok) {
+      return (
+        <main className="container mx-auto max-w-2xl px-4 py-12">
+          <p className="text-red-500">Error loading profile. Please try again.</p>
+        </main>
+      )
     }
 
     user = await res.json()
@@ -73,6 +82,18 @@ export default async function ProfilePage() {
             <span className="font-medium capitalize">{user.plan}</span>
           </div>
 
+          <div className="pt-4 flex gap-2">
+            <Button asChild variant="outline" size="sm">
+              <Link href="/me/edit">Edit Profile</Link>
+            </Button>
+            {!isMockEnabled && (
+              <form action={logout}>
+                <Button type="submit" variant="ghost" size="sm">
+                  Sign Out
+                </Button>
+              </form>
+            )}
+          </div>
         </div>
       </Card>
     </main>

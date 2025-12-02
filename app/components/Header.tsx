@@ -1,14 +1,13 @@
 'use client'
 
 import { MainNav } from '@/app/components/MainNav'
+import { useAuth } from '@/app/providers/AuthProvider'
 import { Button } from '@/shadcn/components/ui/button'
 import Image from 'next/image'
 import { Link } from 'next-view-transitions'
-import { usePathname } from 'next/navigation'
 
 export function Header() {
-  const pathname = usePathname()
-  const showSignIn = pathname === '/'
+  const { isAuthenticated } = useAuth()
 
   return (
     <header className="border-b">
@@ -22,12 +21,19 @@ export function Header() {
           />
         </Link>
         <div className="absolute left-1/2 -translate-x-1/2">
-          <MainNav />
+          <MainNav isAuthenticated={isAuthenticated} />
         </div>
-        {showSignIn && (
+        {!isAuthenticated && (
           <div className="ml-auto flex items-center gap-4">
             <Button variant="ghost" asChild>
               <Link href="/sign-in">Sign In</Link>
+            </Button>
+          </div>
+        )}
+        {isAuthenticated && (
+          <div className="ml-auto flex items-center gap-4">
+            <Button variant="ghost" asChild>
+              <Link href="/me">Profile</Link>
             </Button>
           </div>
         )}
@@ -35,4 +41,3 @@ export function Header() {
     </header>
   )
 }
-

@@ -1,32 +1,19 @@
-"use client"
+'use client'
 
 import { Button } from "@/shadcn/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shadcn/components/ui/card"
 import { Input } from "@/shadcn/components/ui/input"
 import { Label } from "@/shadcn/components/ui/label"
 import Link from "next/link"
-import { useState } from "react"
+import { useActionState } from "react"
+import { signup } from "@/app/actions/auth"
 
 export default function SignUpPage() {
-  const [name, setName] = useState("")
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault()
-
-    // Aqui es donde se hace la petición al backend de users-service --> /auth/register
-    await fetch("https://api.0debt.xyz/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password })
-    })
-  }
+  const [state, action, pending] = useActionState(signup, null)
 
   return (
     <main className="flex min-h-screen items-center justify-center px-4">
       <Card className="w-full max-w-md border-none shadow-none">
-        
         <CardHeader className="text-center space-y-2">
           <CardTitle className="text-3xl font-semibold">Create your account</CardTitle>
           <CardDescription>
@@ -35,17 +22,15 @@ export default function SignUpPage() {
         </CardHeader>
 
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-6">
-
+          <form action={action} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="name">Full name *</Label>
               <Input
                 id="name"
+                name="name"
                 type="text"
                 placeholder="John Doe"
                 className="h-12 text-base"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
                 required
               />
             </div>
@@ -54,11 +39,10 @@ export default function SignUpPage() {
               <Label htmlFor="email">Email address *</Label>
               <Input
                 id="email"
+                name="email"
                 type="email"
                 placeholder="you@example.com"
                 className="h-12 text-base"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </div>
@@ -67,17 +51,20 @@ export default function SignUpPage() {
               <Label htmlFor="password">Password *</Label>
               <Input
                 id="password"
+                name="password"
                 type="password"
                 placeholder="••••••••"
                 className="h-12 text-base"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
                 required
               />
             </div>
 
-            <Button type="submit" className="w-full h-11 text-base">
-              Create account
+            {state?.error && (
+              <p className="text-sm text-red-500">{state.error}</p>
+            )}
+
+            <Button type="submit" className="w-full h-11 text-base" disabled={pending}>
+              {pending ? 'Creating account...' : 'Create account'}
             </Button>
 
             <div className="text-center text-sm">
