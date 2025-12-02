@@ -1,9 +1,31 @@
 import { fetchWithAuth } from "@/app/lib/api"
-import { isMockEnabled, MOCK_USER } from "@/app/lib/mock"
+import { isMockEnabled, MOCK_USER, updateMockPlan } from "@/app/lib/mock"
 import { getSession } from "@/app/lib/session"
 import { Button } from "@/shadcn/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shadcn/components/ui/card"
 import { redirect } from "next/navigation"
+
+
+export async function changePlan(formData: FormData) {
+  "use server"
+
+  const plan = formData.get("plan") as string
+  //Para cambiar el plan en modo mock
+  if (isMockEnabled) {
+    updateMockPlan(plan)
+    return redirect("/plans")
+  }
+  const userId = formData.get("userId") as string
+
+  await fetchWithAuth(`/users/${userId}/plan`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ plan }),
+  })
+
+  redirect("/plans")
+}
+
 
 export default async function PlansPage() {
   let user
@@ -46,18 +68,22 @@ export default async function PlansPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <ul className="text-sm space-y-2">
-              <li>• Up to 2 groups</li>
-              <li>• Unlimited expenses</li>
-              <li>• No add-ons</li>
+              <li>• Caracteristicas Plan Free</li>
             </ul>
 
-            <Button 
-              className="w-full"
-              variant={isCurrentPlan("FREE") ? "secondary" : "default"}
-              disabled={isCurrentPlan("FREE")}
-            >
-              {isCurrentPlan("FREE") ? "Current Plan" : "Choose Free"}
-            </Button>
+            <form action={changePlan}>
+              <input type="hidden" name="plan" value="FREE" />
+              <input type="hidden" name="userId" value={user._id} />
+              <Button
+                className="w-full"
+                variant={isCurrentPlan("FREE") ? "secondary" : "default"}
+                disabled={isCurrentPlan("FREE")}
+                type="submit"
+              >
+                {isCurrentPlan("FREE") ? "Current Plan" : "Choose Free"}
+              </Button>
+            </form>
+
           </CardContent>
         </Card>
 
@@ -68,18 +94,22 @@ export default async function PlansPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <ul className="text-sm space-y-2">
-              <li>• Unlimited groups</li>
-              <li>• Optional add-ons</li>
-              <li>• Advanced balance calculations</li>
+              <li>• Caracteristicas Plan Pro</li>
             </ul>
 
-            <Button 
-              className="w-full"
-              variant={isCurrentPlan("PRO") ? "secondary" : "default"}
-              disabled={isCurrentPlan("PRO")}
-            >
-              {isCurrentPlan("PRO") ? "Current Plan" : "Choose Pro"}
-            </Button>
+            <form action={changePlan}>
+              <input type="hidden" name="plan" value="PRO" />
+              <input type="hidden" name="userId" value={user._id} />
+              <Button
+                className="w-full"
+                variant={isCurrentPlan("PRO") ? "secondary" : "default"}
+                disabled={isCurrentPlan("PRO")}
+                type="submit"
+              >
+                {isCurrentPlan("PRO") ? "Current Plan" : "Choose Pro"}
+              </Button>
+            </form>
+
           </CardContent>
         </Card>
 
@@ -90,18 +120,22 @@ export default async function PlansPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <ul className="text-sm space-y-2">
-              <li>• Everything in Pro</li>
-              <li>• Priority support</li>
-              <li>• Premium add-ons</li>
+              <li>• Caracteristicas Plan Enterprise</li>
             </ul>
 
-            <Button 
-              className="w-full"
-              variant={isCurrentPlan("ENTERPRISE") ? "secondary" : "default"}
-              disabled={isCurrentPlan("ENTERPRISE")}
-            >
-              {isCurrentPlan("ENTERPRISE") ? "Current Plan" : "Choose Enterprise"}
-            </Button>
+            <form action={changePlan}>
+              <input type="hidden" name="plan" value="ENTERPRISE" />
+              <input type="hidden" name="userId" value={user._id} />
+              <Button
+                className="w-full"
+                variant={isCurrentPlan("ENTERPRISE") ? "secondary" : "default"}
+                disabled={isCurrentPlan("ENTERPRISE")}
+                type="submit"
+              >
+                {isCurrentPlan("ENTERPRISE") ? "Current Plan" : "Choose Enterprise"}
+              </Button>
+            </form>
+
           </CardContent>
         </Card>
 

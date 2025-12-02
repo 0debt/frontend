@@ -13,3 +13,7 @@ export const MOCK_USER = {
   plan: "FREE",
 }
 
+//Para actualizar el plan del usuario mock
+export function updateMockPlan(plan: string) {
+  MOCK_USER.plan = plan
+}
