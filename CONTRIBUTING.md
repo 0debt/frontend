@@ -7,6 +7,7 @@ Este documento explica la arquitectura, estructura y cómo contribuir al proyect
 - [Arquitectura](#arquitectura)
 - [Tecnologías](#tecnologías)
 - [Estructura del proyecto](#estructura-del-proyecto)
+- [Autenticación](#autenticación)
 - [Routing](#routing)
 - [Añadir nuevas funcionalidades](#añadir-nuevas-funcionalidades)
 - [Componentes UI](#componentes-ui)
@@ -84,6 +85,155 @@ frontend/
 ├── package.json
 └── tsconfig.json          # Configuración TypeScript
 ```
+
+## 🔐 Autenticación
+
+El sistema de autenticación usa **JWT** con cookies HttpOnly siguiendo las mejores prácticas de Next.js 16.
+
+### Arquitectura
+
+```
+┌─────────────┐      ┌─────────────┐      ┌─────────────┐
+│   Cliente   │ ───► │   Next.js   │ ───► │   Backend   │
+│  (Browser)  │      │   Server    │      │ (API Gateway)│
+└─────────────┘      └─────────────┘      └─────────────┘
+       │                    │                    │
+       │  Cookie HttpOnly   │   Authorization    │
+       │  (session)         │   Bearer Token     │
+       └────────────────────┴────────────────────┘
+```
+
+### Archivos clave
+
+| Archivo | Descripción |
+|---------|-------------|
+| `app/lib/session.ts` | Manejo de sesión (crear, obtener, eliminar cookie) |
+| `app/lib/api.ts` | Cliente API con autenticación automática |
+| `app/lib/mock.ts` | Configuración centralizada del modo mock |
+| `app/actions/auth.ts` | Server Actions: `login`, `signup`, `logout` |
+| `proxy.ts` | Middleware para proteger rutas |
+| `app/providers/AuthProvider.tsx` | Contexto React para estado de auth en cliente |
+
+### Flujo de autenticación
+
+**1. Sign Up:**
+```
+Usuario → signup() → POST /auth/register → POST /auth/login → Cookie JWT → Redirect /me
+```
+
+**2. Sign In:**
+```
+Usuario → login() → POST /auth/login → Cookie JWT HttpOnly → Redirect /me
+```
+
+**3. Logout:**
+```
+Usuario → logout() → Eliminar cookie → Redirect /sign-in
+```
+
+### Protección de rutas
+
+El archivo `proxy.ts` protege las rutas automáticamente:
+
+```typescript
+// Rutas protegidas (requieren autenticación)
+const protectedRoutes = ['/me', '/dashboard']
+
+// Rutas de auth (redirigen si ya está autenticado)
+const authRoutes = ['/sign-in', '/sign-up']
+```
+
+- Si un usuario **no autenticado** accede a `/me` → redirige a `/sign-in`
+- Si un usuario **autenticado** accede a `/sign-in` → redirige a `/me`
+
+### Usar autenticación en páginas
+
+**Server Components (recomendado):**
+```typescript
+import { getSession } from '@/app/lib/session'
+import { fetchWithAuth } from '@/app/lib/api'
+import { redirect } from 'next/navigation'
+
+export default async function ProtectedPage() {
+  const session = await getSession()
+  
+  if (!session) {
+    redirect('/sign-in')
+  }
+
+  // Fetch autenticado al backend
+  const res = await fetchWithAuth('/users/me')
+  const user = await res.json()
+
+  return <div>Hola {user.name}</div>
+}
+```
+
+**Client Components:**
+```typescript
+'use client'
+import { useAuth } from '@/app/providers/AuthProvider'
+
+export function UserInfo() {
+  const { user, isAuthenticated } = useAuth()
+
+  if (!isAuthenticated) return null
+
+  return <span>{user?.email}</span>
+}
+```
+
+### Configuración
+
+Variables de entorno en `.env`:
+```bash
+# URL del API Gateway (backend)
+API_GATEWAY_URL=url
+
+# Modo mock para desarrollo local (sin backend)
+MOCK_AUTH=true
+```
+
+### Modo Mock (desarrollo local)
+
+Para desarrollar sin necesidad del backend, activa el modo mock:
+
+1. En tu `.env`, añade:
+```bash
+MOCK_AUTH=true
+```
+
+2. Reinicia el servidor (`bun dev`)
+
+3. Navega a `/me` o `/me/edit`
+
+La configuración del mock está centralizada en `app/lib/mock.ts`:
+
+```typescript
+import { isMockEnabled, MOCK_USER } from "@/app/lib/mock"
+
+// Usar en páginas:
+if (isMockEnabled) {
+  user = MOCK_USER
+} else {
+  // fetch real del backend
+}
+```
+
+El usuario mock:
+```typescript
+{
+  _id: "mock-id",
+  name: "dev-user",
+  email: "dev@local.test",
+  avatar: "https://api.dicebear.com/7.x/thumbs/svg?seed=dev-user",
+  plan: "FREE",
+}
+```
+
+**Nota:** En modo mock, el proxy no bloquea rutas protegidas y las páginas cargan el usuario mock en lugar de consultar el backend.
+
+Para usar autenticación real, cambia `MOCK_AUTH=false` o elimina la variable.
 
 ## 🗺️ Routing
 

@@ -4,19 +4,34 @@ import { cn } from '@/lib/utils'
 import { Link } from 'next-view-transitions'
 import { usePathname } from 'next/navigation'
 
-const navItems = [
+type NavItem = {
+  href: string
+  label: string
+  requiresAuth?: boolean
+}
+
+const navItems: NavItem[] = [
   { href: '/', label: 'Home' },
-  { href: '/dashboard', label: 'Dashboard' },
+  { href: '/dashboard', label: 'Dashboard', requiresAuth: true },
   { href: '/docs', label: 'Docs' },
   { href: '/demo-components', label: 'Demo Components' },
+  { href: '/plans', label: 'Plans', requiresAuth: true },
 ]
 
-export function MainNav() {
+type MainNavProps = {
+  isAuthenticated: boolean
+}
+
+export function MainNav({ isAuthenticated }: MainNavProps) {
   const pathname = usePathname()
+
+  const visibleItems = navItems.filter(item => 
+    !item.requiresAuth || isAuthenticated
+  )
 
   return (
     <nav className="flex items-center gap-6">
-      {navItems.map((item) => {
+      {visibleItems.map((item) => {
         const isActive = pathname === item.href || pathname.startsWith(`${item.href}/`)
         return (
           <Link
@@ -34,4 +49,3 @@ export function MainNav() {
     </nav>
   )
 }
-
