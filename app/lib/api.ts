@@ -8,6 +8,17 @@ type FetchOptions = Omit<RequestInit, 'headers'> & {
 }
 
 /**
+ * Logs API requests to console
+ */
+function logRequest(method: string, endpoint: string, status: number, duration: number) {
+  const icon = status >= 400 ? '✗' : '→'
+  const displayUrl = endpoint.startsWith('http') 
+    ? endpoint.replace(API_URL || '', '') 
+    : endpoint
+  console.log(`${icon} [API] ${method} ${displayUrl} ${status} (${duration}ms)`)
+}
+
+/**
  * Fetch with automatic authentication
  * Adds the user's JWT token to requests
  * @param endpoint - API endpoint (e.g., '/users/me')
@@ -18,6 +29,8 @@ export async function fetchWithAuth(
   endpoint: string,
   options: FetchOptions = {}
 ): Promise<Response> {
+  const startTime = Date.now()
+  const method = options.method || 'GET'
   const token = await getSessionToken()
 
   const headers: Record<string, string> = {
@@ -33,10 +46,21 @@ export async function fetchWithAuth(
     ? endpoint 
     : `${API_URL}/api/v1${endpoint}`
 
-  return fetch(url, {
-    ...options,
-    headers,
-  })
+  try {
+    const response = await fetch(url, {
+      ...options,
+      headers,
+    })
+    
+    const duration = Date.now() - startTime
+    logRequest(method, endpoint, response.status, duration)
+    
+    return response
+  } catch (error) {
+    const duration = Date.now() - startTime
+    logRequest(method, endpoint, 0, duration)
+    throw error
+  }
 }
 
 /**
@@ -49,6 +73,8 @@ export async function fetchApi(
   endpoint: string,
   options: FetchOptions = {}
 ): Promise<Response> {
+  const startTime = Date.now()
+  const method = options.method || 'GET'
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
     ...options.headers,
@@ -58,9 +84,20 @@ export async function fetchApi(
     ? endpoint 
     : `${API_URL}/api/v1${endpoint}`
 
-  return fetch(url, {
-    ...options,
-    headers,
-  })
+  try {
+    const response = await fetch(url, {
+      ...options,
+      headers,
+    })
+    
+    const duration = Date.now() - startTime
+    logRequest(method, endpoint, response.status, duration)
+    
+    return response
+  } catch (error) {
+    const duration = Date.now() - startTime
+    logRequest(method, endpoint, 0, duration)
+    throw error
+  }
 }
 
