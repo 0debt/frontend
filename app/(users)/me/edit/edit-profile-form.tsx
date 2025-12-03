@@ -5,7 +5,7 @@ import { Button } from "@/shadcn/components/ui/button"
 import { Input } from "@/shadcn/components/ui/input"
 import { Label } from "@/shadcn/components/ui/label"
 import { useRouter } from "next/navigation"
-import { useState } from "react"
+import { useRef, useState } from "react"
 
 type User = {
   _id: string
@@ -19,6 +19,7 @@ export default function EditProfileForm({ user }: { user: User }) {
   const [name, setName] = useState(user.name)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const fileRef = useRef<File | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -41,6 +42,19 @@ export default function EditProfileForm({ user }: { user: User }) {
 
   return (
     <form onSubmit={handleSubmit} className="p-6 space-y-6 text-sm">
+      <div className="space-y-2">
+        <Label>Avatar</Label>
+        <Input 
+          type="file"
+          accept="image/*"
+          className="h-11"
+          onChange={(e) => {
+            fileRef.current = e.target.files?.[0] || null
+          }}
+        />
+      </div>
+
+
       <div className="space-y-2">
         <Label>Name</Label>
         <Input

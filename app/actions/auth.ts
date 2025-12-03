@@ -1,8 +1,8 @@
 'use server'
 
-import { redirect } from 'next/navigation'
-import { createSession, deleteSession } from '@/app/lib/session'
 import { fetchApi, fetchWithAuth } from '@/app/lib/api'
+import { createSession, deleteSession } from '@/app/lib/session'
+import { redirect } from 'next/navigation'
 
 export type AuthState = {
   error?: string
@@ -112,6 +112,7 @@ export async function logout() {
 export async function updateProfile(formData: FormData): Promise<AuthState> {
   const id = formData.get('id') as string
   const name = formData.get('name') as string
+  const avatar = formData.get("avatar") as File | null
 
   if (!id || !name) {
     return { error: 'Invalid data' }
@@ -121,12 +122,29 @@ export async function updateProfile(formData: FormData): Promise<AuthState> {
     const res = await fetchWithAuth(`/users/${id}`, {
       method: 'PATCH',
       body: JSON.stringify({ name }),
+      headers: { "Content-Type": "application/json" }
     })
 
     if (!res.ok) {
       const data = await res.json()
-      return { error: data.error || 'Failed to update profile' }
+      return { error: data.error || 'Failed to update name' }
     }
+
+    if (avatar) {
+      const avatarForm = new FormData()
+      avatarForm.append("avatar", avatar)
+
+      const resAvatar = await fetchWithAuth(`/users/${id}/avatar`, {
+        method: "PATCH",
+        body: avatarForm 
+      })
+
+      if (!resAvatar.ok) {
+        const data = await resAvatar.json()
+        return { error: data.error || "Failed to upload avatar" }
+      }
+    }
+
 
     return { success: true }
   } catch {
