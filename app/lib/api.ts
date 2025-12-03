@@ -10,12 +10,27 @@ type FetchOptions = Omit<RequestInit, 'headers'> & {
 /**
  * Logs API requests to console
  */
-function logRequest(method: string, endpoint: string, status: number, duration: number) {
+function logRequest(method: string, endpoint: string, status: number, duration: number, error?: string) {
   const icon = status >= 400 ? '✗' : '→'
   const displayUrl = endpoint.startsWith('http') 
     ? endpoint.replace(API_URL || '', '') 
     : endpoint
-  console.log(`${icon} [API] ${method} ${displayUrl} ${status} (${duration}ms)`)
+  const errorMsg = error ? ` - ${error}` : ''
+  console.log(`${icon} [API] ${method} ${displayUrl} ${status} (${duration}ms)${errorMsg}`)
+}
+
+/**
+ * Safely extracts error message from response
+ */
+async function extractError(response: Response): Promise<string | undefined> {
+  if (response.status < 400) return undefined
+  try {
+    const cloned = response.clone()
+    const data = await cloned.json()
+    return data.error || data.message || JSON.stringify(data)
+  } catch {
+    return undefined
+  }
 }
 
 /**
@@ -44,7 +59,7 @@ export async function fetchWithAuth(
 
   const url = endpoint.startsWith('http') 
     ? endpoint 
-    : `${API_URL}/api/v1${endpoint}`
+    : `${API_URL}${endpoint}`
 
   try {
     const response = await fetch(url, {
@@ -53,12 +68,13 @@ export async function fetchWithAuth(
     })
     
     const duration = Date.now() - startTime
-    logRequest(method, endpoint, response.status, duration)
+    const errorMsg = await extractError(response)
+    logRequest(method, endpoint, response.status, duration, errorMsg)
     
     return response
   } catch (error) {
     const duration = Date.now() - startTime
-    logRequest(method, endpoint, 0, duration)
+    logRequest(method, endpoint, 0, duration, String(error))
     throw error
   }
 }
@@ -82,7 +98,7 @@ export async function fetchApi(
 
   const url = endpoint.startsWith('http') 
     ? endpoint 
-    : `${API_URL}/api/v1${endpoint}`
+    : `${API_URL}${endpoint}`
 
   try {
     const response = await fetch(url, {
@@ -91,12 +107,13 @@ export async function fetchApi(
     })
     
     const duration = Date.now() - startTime
-    logRequest(method, endpoint, response.status, duration)
+    const errorMsg = await extractError(response)
+    logRequest(method, endpoint, response.status, duration, errorMsg)
     
     return response
   } catch (error) {
     const duration = Date.now() - startTime
-    logRequest(method, endpoint, 0, duration)
+    logRequest(method, endpoint, 0, duration, String(error))
     throw error
   }
 }
