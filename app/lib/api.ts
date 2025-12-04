@@ -26,10 +26,17 @@ async function extractError(response: Response): Promise<string | undefined> {
   if (response.status < 400) return undefined
   try {
     const cloned = response.clone()
-    const data = await cloned.json()
-    return data.error || data.message || JSON.stringify(data)
-  } catch {
-    return undefined
+    const text = await cloned.text()
+    console.log('[API DEBUG] Error response body:', text)
+    try {
+      const data = JSON.parse(text)
+      return data.error || data.message || text
+    } catch {
+      return text || `Status ${response.status}`
+    }
+  } catch (e) {
+    console.log('[API DEBUG] Failed to extract error:', e)
+    return `Status ${response.status}`
   }
 }
 
