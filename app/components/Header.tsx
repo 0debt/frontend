@@ -3,8 +3,10 @@
 import { MainNav } from '@/app/components/MainNav'
 import { useAuth } from '@/app/providers/AuthProvider'
 import { Button } from '@/shadcn/components/ui/button'
-import Image from 'next/image'
 import { Link } from 'next-view-transitions'
+import Image from 'next/image'
+// 👇 1. IMPORTAMOS LA CAMPANITA
+import { NotificationBell } from './NotificationBell'
 
 export function Header() {
   const { isAuthenticated } = useAuth()
@@ -23,6 +25,8 @@ export function Header() {
         <div className="absolute left-1/2 -translate-x-1/2">
           <MainNav isAuthenticated={isAuthenticated} />
         </div>
+        
+        {/* Usuario NO logueado */}
         {!isAuthenticated && (
           <div className="ml-auto flex items-center gap-4">
             <Button variant="ghost" asChild>
@@ -30,8 +34,13 @@ export function Header() {
             </Button>
           </div>
         )}
+
+        {/* Usuario LOGUEADO */}
         {isAuthenticated && (
           <div className="ml-auto flex items-center gap-4">
+            {/* 👇 2. AQUÍ PONEMOS LA CAMPANA (antes del perfil) */}
+            <NotificationBell />
+            
             <Button variant="ghost" asChild>
               <Link href="/me">Profile</Link>
             </Button>
