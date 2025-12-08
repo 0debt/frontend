@@ -8,11 +8,7 @@ export interface NotificationItem {
   createdAt: string;
 }
 
-// 1. CONFIGURACIÓN DINÁMICA
-// Leemos la variable de entorno pública.
-// - En Local: Usará 'http://localhost:4000' (definido en tu .env.local o por defecto aquí)
-// - En Producción: Usará la URL del Gateway que configuren en Coolify
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+import { withApiBase } from '@/app/lib/config';
 
 /**
  * Obtiene notificaciones desde el Client Component.
@@ -20,10 +16,10 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
  */
 export async function getNotifications(userId: string): Promise<NotificationItem[]> {
   try {
-    // 2. PETICIÓN CON URL COMPLETA
-    // Construimos la URL: "http://localhost:4000/notifications/123..."
-    console.log('🔍 FETCHING URL:', `${API_URL}/notifications/${userId}`);
-    const res = await fetch(`${API_URL}/notifications/${userId}`);
+    // Usamos la ruta interna de Next para que el servidor añada el JWT
+    const url = withApiBase(`/api/notifications/${userId}`, '');
+    console.log('🔍 FETCHING URL (proxy):', url);
+    const res = await fetch(url);
     
     if (!res.ok) {
       console.error('Error fetching notifications:', res.status, res.statusText);

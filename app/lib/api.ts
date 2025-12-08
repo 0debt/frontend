@@ -1,7 +1,6 @@
+import { API_GATEWAY_URL, withApiBase } from '@/app/lib/config'
 import { getSessionToken } from '@/app/lib/session'
 import 'server-only'
-
-const API_URL = process.env.API_GATEWAY_URL
 
 type FetchOptions = Omit<RequestInit, 'headers'> & {
   headers?: Record<string, string>
@@ -13,7 +12,7 @@ type FetchOptions = Omit<RequestInit, 'headers'> & {
 function logRequest(method: string, endpoint: string, status: number, duration: number, error?: string) {
   const icon = status >= 400 ? '✗' : '→'
   const displayUrl = endpoint.startsWith('http') 
-    ? endpoint.replace(API_URL || '', '') 
+    ? endpoint.replace(API_GATEWAY_URL || '', '') 
     : endpoint
   const errorMsg = error ? ` - ${error}` : ''
   console.log(`${icon} [API] ${method} ${displayUrl} ${status} (${duration}ms)${errorMsg}`)
@@ -64,9 +63,7 @@ export async function fetchWithAuth(
     headers['Authorization'] = `Bearer ${token}`
   }
 
-  const url = endpoint.startsWith('http') 
-    ? endpoint 
-    : `${API_URL}${endpoint}`
+  const url = withApiBase(endpoint, API_GATEWAY_URL)
 
   try {
     const response = await fetch(url, {
@@ -103,9 +100,7 @@ export async function fetchApi(
     ...options.headers,
   }
 
-  const url = endpoint.startsWith('http') 
-    ? endpoint 
-    : `${API_URL}${endpoint}`
+  const url = withApiBase(endpoint, API_GATEWAY_URL)
 
   try {
     const response = await fetch(url, {
