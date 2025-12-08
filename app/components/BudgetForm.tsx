@@ -1,6 +1,7 @@
 'use client'
 
 import { BudgetActionState, createBudget, updateBudget } from '@/app/actions/budgets'
+import { NumberInput } from '@/app/components/NumberInput'
 import { Budget } from '@/app/lib/mock'
 import { Button } from '@/shadcn/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shadcn/components/ui/card'
@@ -14,7 +15,6 @@ import {
   SelectValue,
 } from '@/shadcn/components/ui/select'
 import { useActionState, useState } from 'react'
-import { NumberInput } from '@/app/components/NumberInput'
 
 type BudgetFormProps = {
   budget?: Budget
