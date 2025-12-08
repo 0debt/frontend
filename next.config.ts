@@ -7,6 +7,12 @@ const nextConfig: NextConfig = {
   experimental: {
     viewTransition: true,
   },
+  env: {
+    NEXT_PUBLIC_API_GATEWAY_URL:
+      process.env.API_GATEWAY_URL ||
+      process.env.NEXT_PUBLIC_API_GATEWAY_URL ||
+      'http://api-gateway:8000',
+  },
 };
 
 export default nextConfig;
