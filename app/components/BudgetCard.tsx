@@ -18,6 +18,9 @@ import { Progress } from '@/shadcn/components/ui/progress'
 import { Link } from 'next-view-transitions'
 import React, { useTransition } from 'react'
 
+const formatEUR = (value: number) =>
+  new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(value)
+
 type BudgetCardProps = {
   budget: Budget
   status?: BudgetStatus
@@ -57,7 +60,10 @@ export function BudgetCard({ budget, status }: BudgetCardProps) {
               {budget.category || 'General'}
             </CardTitle>
             <CardDescription className="mt-1">
-              {budget.period} • Limit: ${budget.limitAmount.toFixed(2)}
+              {budget.period} • Limit: {formatEUR(budget.limitAmount)}
+            </CardDescription>
+            <CardDescription className="mt-1 text-xs text-muted-foreground">
+              Group: {budget.groupId}
             </CardDescription>
           </div>
           {status && (
@@ -74,7 +80,7 @@ export function BudgetCard({ budget, status }: BudgetCardProps) {
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Spent</span>
                 <span className="font-medium">
-                  ${status.spent.toFixed(2)} / ${status.limit.toFixed(2)}
+                  {formatEUR(status.spent)} / {formatEUR(status.limit)}
                 </span>
               </div>
               <Progress value={percentage} />

@@ -27,7 +27,7 @@ export async function createBudget(
     return { error: 'Limit amount and period are required' }
   }
 
-  const limitAmountNum = parseFloat(limitAmount)
+  const limitAmountNum = parseFloat(limitAmount.replace(',', '.'))
   if (isNaN(limitAmountNum) || limitAmountNum <= 0) {
     return { error: 'Limit amount must be a positive number' }
   }
@@ -77,7 +77,7 @@ export async function updateBudget(
     return { error: 'Limit amount is required' }
   }
 
-  const limitAmountNum = parseFloat(limitAmount)
+  const limitAmountNum = parseFloat(limitAmount.replace(',', '.'))
   if (isNaN(limitAmountNum) || limitAmountNum <= 0) {
     return { error: 'Limit amount must be a positive number' }
   }

@@ -1,5 +1,5 @@
 import { fetchWithAuth } from '@/app/lib/api'
-import { isMockEnabled, MOCK_BUDGETS, MOCK_BUDGET_STATUSES, Budget, BudgetStatus } from '@/app/lib/mock'
+import { isMockEnabled, MOCK_BUDGETS, MOCK_BUDGET_STATUSES, Budget, BudgetStatus, MOCK_USER } from '@/app/lib/mock'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shadcn/components/ui/card'
 import { Badge } from '@/shadcn/components/ui/badge'
 import { Progress } from '@/shadcn/components/ui/progress'
@@ -9,6 +9,9 @@ import { ArrowLeft, Edit } from 'lucide-react'
 import { notFound } from 'next/navigation'
 import { DeleteBudgetButton } from '@/app/components/DeleteBudgetButton'
 import Image from 'next/image'
+
+const formatEUR = (value: number) =>
+  new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(value)
 
 type Props = {
   params: Promise<{ id: string }>
@@ -80,8 +83,10 @@ async function getChartUrl(budgetId: string): Promise<string | null> {
       return null
     }
 
-    const data = await res.json()
-    return data.url || null
+    // Backend now returns the image (png). Convert to data URL for rendering.
+    const buffer = await res.arrayBuffer()
+    const base64 = Buffer.from(buffer).toString('base64')
+    return `data:image/png;base64,${base64}`
   } catch (error) {
     console.error('Error fetching chart:', error)
     return null
@@ -97,7 +102,25 @@ export default async function BudgetDetailPage({ params }: Props) {
   }
 
   const status = await getBudgetStatus(id)
-  const chartUrl = await getChartUrl(id)
+
+  // Obtener plan del usuario
+  let userPlan = 'FREE'
+  if (isMockEnabled) {
+    userPlan = MOCK_USER.plan || 'FREE'
+  } else {
+    try {
+      const res = await fetchWithAuth('/users/me', { cache: 'no-store' })
+      if (res.ok) {
+        const me = await res.json()
+        userPlan = (me?.plan || 'FREE').toUpperCase()
+      }
+    } catch (error) {
+      console.error('Error fetching user plan:', error)
+    }
+  }
+
+  const canViewChart = userPlan === 'PRO' || userPlan === 'ENTERPRISE'
+  const chartUrl = canViewChart ? await getChartUrl(id) : null
 
   const percentage = status ? Math.min((status.spent / status.limit) * 100, 100) : 0
 
@@ -158,12 +181,12 @@ export default async function BudgetDetailPage({ params }: Props) {
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Spent</span>
                     <span className="font-medium">
-                      ${status.spent.toFixed(2)} / ${status.limit.toFixed(2)}
+                      {formatEUR(status.spent)} / {formatEUR(status.limit)}
                     </span>
                   </div>
                   <Progress value={percentage} />
                   <div className="flex justify-between text-xs text-muted-foreground">
-                    <span>Remaining: ${(status.limit - status.spent).toFixed(2)}</span>
+                    <span>Remaining: {formatEUR(status.limit - status.spent)}</span>
                     <span>{percentage.toFixed(1)}% used</span>
                   </div>
                 </div>
@@ -181,8 +204,12 @@ export default async function BudgetDetailPage({ params }: Props) {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="flex justify-between">
+              <span className="text-sm text-muted-foreground">Group</span>
+              <span className="text-sm font-medium">{budget.groupId}</span>
+            </div>
+            <div className="flex justify-between">
               <span className="text-sm text-muted-foreground">Limit Amount</span>
-              <span className="text-sm font-medium">${budget.limitAmount.toFixed(2)}</span>
+              <span className="text-sm font-medium">{formatEUR(budget.limitAmount)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-sm text-muted-foreground">Period</span>
@@ -198,25 +225,38 @@ export default async function BudgetDetailPage({ params }: Props) {
         </Card>
       </div>
 
-      {chartUrl && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Spending Chart</CardTitle>
-            <CardDescription>Visual breakdown by category</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex justify-center">
-              <Image
-                src={chartUrl}
-                alt="Budget chart"
-                width={500}
-                height={300}
-                className="rounded-lg"
-              />
+      <Card>
+        <CardHeader>
+          <CardTitle>Spending Chart</CardTitle>
+          <CardDescription>Visual breakdown by category</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {canViewChart ? (
+            chartUrl ? (
+              <div className="flex justify-center">
+                <Image
+                  src={chartUrl}
+                  alt="Budget chart"
+                  width={500}
+                  height={300}
+                  className="rounded-lg"
+                />
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground">Chart unavailable</p>
+            )
+          ) : (
+            <div className="space-y-3 text-sm">
+              <p className="text-muted-foreground">
+                Charts are available on PRO or ENTERPRISE plans.
+              </p>
+              <Button asChild variant="default">
+                <Link href="/plans">Upgrade to Pro</Link>
+              </Button>
             </div>
-          </CardContent>
-        </Card>
-      )}
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }

@@ -4,7 +4,6 @@ import { BudgetActionState, createBudget, updateBudget } from '@/app/actions/bud
 import { Budget } from '@/app/lib/mock'
 import { Button } from '@/shadcn/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shadcn/components/ui/card'
-import { Input } from '@/shadcn/components/ui/input'
 import { Label } from '@/shadcn/components/ui/label'
 import {
   Select,
@@ -14,6 +13,7 @@ import {
   SelectValue,
 } from '@/shadcn/components/ui/select'
 import { useActionState, useState } from 'react'
+import { NumberInput } from '@/app/components/NumberInput'
 
 type BudgetFormProps = {
   budget?: Budget
@@ -56,22 +56,20 @@ export function BudgetForm({ budget, mode }: BudgetFormProps) {
             <Label htmlFor="limitAmount">
               Limit Amount <span className="text-destructive">*</span>
             </Label>
-            <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">
-                $
-              </span>
-              <Input
-                id="limitAmount"
-                name="limitAmount"
-                type="number"
-                step="0.01"
-                min="0"
-                placeholder="500.00"
-                required
-                defaultValue={budget?.limitAmount}
-                className="pl-7"
-              />
-            </div>
+            <NumberInput
+              id="limitAmount"
+              name="limitAmount"
+              allowNegative={false}
+              decimalSeparator=","
+              thousandSeparator="."
+              decimalScale={2}
+              fixedDecimalScale
+              min={0}
+              placeholder="500,00 €"
+              required
+              defaultValue={budget?.limitAmount}
+              suffix=" €"
+            />
           </div>
 
           {mode === 'create' && (
