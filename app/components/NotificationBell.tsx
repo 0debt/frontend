@@ -17,15 +17,18 @@ export function NotificationBell() {
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
 
-  // Cargar notificaciones
+  // Cargar notificaciones al montar/cambiar de usuario (para F5)...
   useEffect(() => {
-    // Verificamos si hay usuario y tiene 'sub' (que es el userId en Mongo)
-    if (isAuthenticated && user?.id) { 
-      getNotifications(user.id).then((data) => {
-        setNotifications(data);
-      });
-    }
-  }, [isAuthenticated, user, isOpen]);
+    if (!isAuthenticated || !user?.id) return;
+    getNotifications(user.id).then(setNotifications);
+  }, [isAuthenticated, user?.id]);
+
+  // ...y refrescar al abrir el popover
+  useEffect(() => {
+    if (!isOpen) return;
+    if (!isAuthenticated || !user?.id) return;
+    getNotifications(user.id).then(setNotifications);
+  }, [isOpen, isAuthenticated, user?.id]);
 
   // Si no está logueado, no mostramos nada
   if (!isAuthenticated) return null;
