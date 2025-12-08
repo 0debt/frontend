@@ -22,9 +22,9 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Crea un usuario y grupo sin privilegios
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+# Crea un usuario y grupo sin privilegios (shadow-utils disponibles en la base)
+RUN groupadd -g 1001 nodejs \
+ && useradd -u 1001 -g nodejs -m nextjs
 
 # Copia solo los archivos optimizados de la build standalone
 COPY --from=builder /app/public ./public
