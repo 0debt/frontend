@@ -53,10 +53,12 @@ frontend/
 │   │   └── sign-in/       # /sign-in
 │   ├── (marketing)/       # Route Group
 │   │   └── page.tsx       # / (homepage)
-│   ├── dashboard/         # /dashboard
-│   │   ├── (analytics)/   # Route Group
-│   │   │   └── page.tsx   # /dashboard (renderiza analytics)
-│   │   └── layout.tsx     # Layout para /dashboard/*
+│   ├── budgets/           # /budgets
+│   │   ├── [id]/          # /budgets/:id
+│   │   │   ├── page.tsx   # Detalle del budget
+│   │   │   └── edit/      # /budgets/:id/edit
+│   │   ├── new/           # /budgets/new
+│   │   └── page.tsx       # Lista de budgets
 │   ├── docs/              # /docs
 │   │   └── page.tsx
 │   ├── components/        # Componentes específicos de la app
@@ -137,7 +139,7 @@ El archivo `proxy.ts` protege las rutas automáticamente:
 
 ```typescript
 // Rutas protegidas (requieren autenticación)
-const protectedRoutes = ['/me', '/dashboard']
+const protectedRoutes = ['/me', '/budgets']
 
 // Rutas de auth (redirigen si ya está autenticado)
 const authRoutes = ['/sign-in', '/sign-up']
@@ -245,8 +247,8 @@ app/
 ├── about/page.tsx        → /about
 ├── (auth)/
 │   └── sign-in/page.tsx  → /sign-in (el (auth) no aparece en la URL)
-└── dashboard/
-    └── page.tsx          → /dashboard
+└── budgets/
+    └── page.tsx          → /budgets
 ```
 
 **Rutas dinámicas:**
@@ -310,6 +312,13 @@ export default async function ProductPage({ params }: Props) {
   return <div>Product {id}</div>
 }
 ```
+
+### Llamadas a servicios (Gateway / Kong)
+
+- Usa siempre `fetchWithAuth` (`app/lib/api.ts`) desde Server Components / API routes; añade el token automáticamente.
+- En Client Components, no llames directo al gateway: crea una ruta interna en `app/api/*` que proxye con `fetchWithAuth` y consume esa ruta desde el cliente.
+- Notificaciones: la campana usa `/api/notifications/:userId` (ruta interna) para que el servidor adjunte JWT. Evita usar `API_GATEWAY_URL` directo en el navegador.
+- Configuración central de URLs en `app/lib/config.ts` (`API_GATEWAY_URL` única fuente; `NEXT_PUBLIC_` solo para exponer la URL, no secretos).
 
 ## 🎨 Componentes UI
 
