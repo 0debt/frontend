@@ -6,5 +6,11 @@ export async function register() {
   } catch {
     console.log("Frontend version: unknown");
   }
+
+  const gatewayUrl =
+    process.env.API_GATEWAY_URL ||
+    process.env.NEXT_PUBLIC_API_GATEWAY_URL ||
+    'http://api-gateway:8000';
+  console.log(`API Gateway URL: ${gatewayUrl}`);
 }
 
