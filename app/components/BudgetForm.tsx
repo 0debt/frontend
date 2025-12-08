@@ -4,6 +4,7 @@ import { BudgetActionState, createBudget, updateBudget } from '@/app/actions/bud
 import { Budget } from '@/app/lib/mock'
 import { Button } from '@/shadcn/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shadcn/components/ui/card'
+import { Input } from '@/shadcn/components/ui/input'
 import { Label } from '@/shadcn/components/ui/label'
 import {
   Select,
@@ -57,8 +58,8 @@ export function BudgetForm({ budget, mode }: BudgetFormProps) {
               Limit Amount <span className="text-destructive">*</span>
             </Label>
             <NumberInput
-              id="limitAmount"
-              name="limitAmount"
+                id="limitAmount"
+                name="limitAmount"
               allowNegative={false}
               decimalSeparator=","
               thousandSeparator="."
@@ -66,10 +67,10 @@ export function BudgetForm({ budget, mode }: BudgetFormProps) {
               fixedDecimalScale
               min={0}
               placeholder="500,00 €"
-              required
-              defaultValue={budget?.limitAmount}
+                required
+                defaultValue={budget?.limitAmount}
               suffix=" €"
-            />
+              />
           </div>
 
           {mode === 'create' && (
