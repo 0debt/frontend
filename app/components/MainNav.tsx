@@ -12,7 +12,7 @@ type NavItem = {
 
 const navItems: NavItem[] = [
   { href: '/', label: 'Home' },
-  { href: '/dashboard', label: 'Dashboard', requiresAuth: true },
+  { href: '/budgets', label: 'Budgets', requiresAuth: true },
   { href: '/docs', label: 'Docs' },
   { href: '/demo-components', label: 'Demo Components' },
   { href: '/plans', label: 'Plans', requiresAuth: true },
