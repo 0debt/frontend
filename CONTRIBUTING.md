@@ -196,6 +196,12 @@ API_GATEWAY_URL=url
 MOCK_AUTH=true
 ```
 
+### Sesión y expiración
+
+- El JWT que devuelve users-service se guarda en la cookie `session` (HttpOnly, SameSite Lax, secure en prod) con una caducidad de ~1 hora.
+- `getSession` decodifica el payload y, si `exp` está vencido, elimina la cookie y devuelve `null`.
+- No hay refresh token ni “remember me”: pasado el vencimiento, el usuario debe iniciar sesión de nuevo.
+
 ### Modo Mock (desarrollo local)
 
 Para desarrollar sin necesidad del backend, activa el modo mock:
