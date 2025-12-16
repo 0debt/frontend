@@ -30,21 +30,24 @@ export default function EditProfileForm({ user }: { user: User }) {
     formData.set("id", user._id)
     formData.set("name", name)
 
-    const result = await updateProfile(formData)
+    if (fileRef.current) {
+      formData.set("avatar", fileRef.current)
+    }
 
+    const result = await updateProfile(formData)
     if (result?.error) {
       setError(result.error)
       setLoading(false)
-    } else {
-      router.push("/me")
     }
+    router.refresh()
+    router.push("/me")
   }
 
   return (
     <form onSubmit={handleSubmit} className="p-6 space-y-6 text-sm">
       <div className="space-y-2">
         <Label>Avatar</Label>
-        <Input 
+        <Input
           type="file"
           accept="image/*"
           className="h-11"

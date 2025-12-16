@@ -1,7 +1,7 @@
 'use server'
 
 import { fetchApi, fetchWithAuth } from '@/app/lib/api'
-import { createSession, deleteSession } from '@/app/lib/session'
+import { createSession, deleteSession, getSessionToken } from '@/app/lib/session'
 import { redirect } from 'next/navigation'
 
 export type AuthState = {
@@ -133,10 +133,14 @@ export async function updateProfile(formData: FormData): Promise<AuthState> {
     if (avatar) {
       const avatarForm = new FormData()
       avatarForm.append("avatar", avatar)
-
-      const resAvatar = await fetchWithAuth(`/users/${id}/avatar`, {
+      const token = await getSessionToken()
+      const BASE_URL = process.env.API_GATEWAY_URL!
+      const resAvatar = await fetch(`${BASE_URL}/users/${id}/avatar`, {
         method: "PATCH",
-        body: avatarForm 
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: avatarForm
       })
 
       if (!resAvatar.ok) {
