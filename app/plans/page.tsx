@@ -4,6 +4,7 @@ import { getSession } from "@/app/lib/session"
 import { Button } from "@/shadcn/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shadcn/components/ui/card"
 import { redirect } from "next/navigation"
+import { logout } from "../actions/auth"
 
 
 export async function changePlan(formData: FormData) {
@@ -17,12 +18,16 @@ export async function changePlan(formData: FormData) {
   }
   const userId = formData.get("userId") as string
 
-  await fetchWithAuth(`/users/${userId}/plan`, {
+  const res = await fetchWithAuth(`/users/${userId}/plan`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ plan }),
   })
 
+  const data = await res.json()
+  if (data.message?.includes("iniciar sesión")) {
+    await logout()
+  }
   redirect("/plans")
 }
 
@@ -56,6 +61,9 @@ export default async function PlansPage() {
         <h1 className="text-4xl font-bold">Subscription Plans</h1>
         <p className="mt-2 text-muted-foreground">
           Choose the plan that best fits your needs.
+        </p>
+        <p className="mt-2 text-muted-foreground">
+          Al cambiar de plan el usuario tendrá que volver a iniciar sesión para actualizar las ventajas del plan seleccionado.
         </p>
       </div>
 
@@ -95,6 +103,7 @@ export default async function PlansPage() {
           <CardContent className="space-y-4">
             <ul className="text-sm space-y-2">
               <li>• Caracteristicas Plan Pro</li>
+              <li>• Actualización del avatar</li>
             </ul>
 
             <form action={changePlan}>
@@ -121,6 +130,7 @@ export default async function PlansPage() {
           <CardContent className="space-y-4">
             <ul className="text-sm space-y-2">
               <li>• Caracteristicas Plan Enterprise</li>
+              <li>• Actualización del avatar</li>
             </ul>
 
             <form action={changePlan}>
