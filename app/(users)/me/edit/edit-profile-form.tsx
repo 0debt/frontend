@@ -20,6 +20,7 @@ export default function EditProfileForm({ user }: { user: User }) {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const fileRef = useRef<File | null>(null)
+  const canChangeAvatar = user.plan === "PRO" || user.plan === "ENTERPRISE"
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -47,14 +48,39 @@ export default function EditProfileForm({ user }: { user: User }) {
     <form onSubmit={handleSubmit} className="p-6 space-y-6 text-sm">
       <div className="space-y-2">
         <Label>Avatar</Label>
-        <Input
-          type="file"
-          accept="image/*"
-          className="h-11"
-          onChange={(e) => {
-            fileRef.current = e.target.files?.[0] || null
-          }}
-        />
+        {canChangeAvatar ? (
+          <Input
+            type="file"
+            accept="image/*"
+            className="h-11"
+            onChange={(e) => {
+              fileRef.current = e.target.files?.[0] || null
+            }}
+          />
+
+        ) : (
+          <div className="rounded-md border border-dashed border-muted-foreground/40 bg-muted/40 p-4">
+            <div className="flex items-start gap-3">
+              <div className="space-y-1">
+                <p className="text-sm font-medium">
+                  Avatar no disponible en tu plan
+                </p>
+
+                <p className="text-xs text-muted-foreground">
+                  La subida de avatar está disponible solo para planes PRO o ENTERPRISE.
+                </p>
+
+                <a
+                  href="/plans"
+                  className="inline-block text-xs font-medium text-primary underline underline-offset-4"
+                >
+                  Ver planes disponibles →
+                </a>
+              </div>
+            </div>
+          </div>
+
+        )}
       </div>
 
 
