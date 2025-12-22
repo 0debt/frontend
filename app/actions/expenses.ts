@@ -92,7 +92,7 @@ export async function createExpense(
       date: new Date().toISOString()
     }
 
-    const res = await fetchWithAuth('/api/v1/expenses', {
+    const res = await fetchWithAuth('/expenses', {
       method: 'POST',
       body: JSON.stringify(body),
     })
@@ -119,7 +119,7 @@ export async function deleteExpense(
   groupId: string
 ): Promise<ExpenseActionState> {
   try {
-    const res = await fetchWithAuth(`/api/v1/expenses/${expenseId}`, {
+    const res = await fetchWithAuth(`/expenses/${expenseId}`, {
       method: 'DELETE',
     })
 
