@@ -13,6 +13,16 @@ const nextConfig: NextConfig = {
       process.env.NEXT_PUBLIC_API_GATEWAY_URL ||
       'http://api-gateway:8000',
   },
+  // Configurar dominios externos para next/image
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'api.dicebear.com',
+        pathname: '/**',
+      },
+    ],
+  },
 };
 
 export default nextConfig;
