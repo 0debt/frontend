@@ -1,13 +1,13 @@
 import { fetchWithAuth } from '@/app/lib/api'
 import {
-    BalanceResponse,
-    formatCurrency,
-    getUserAvatar,
-    getUserName,
-    isMockEnabled,
-    MOCK_BALANCE,
-    MOCK_USERS,
-    UserInfo,
+  BalanceResponse,
+  formatCurrency,
+  getUserAvatar,
+  getUserName,
+  isMockEnabled,
+  MOCK_BALANCE,
+  MOCK_USERS,
+  UserInfo,
 } from '@/app/lib/expenses'
 import { Badge } from '@/shadcn/components/ui/badge'
 import { Button } from '@/shadcn/components/ui/button'
@@ -26,7 +26,7 @@ async function getBalances(groupId: string): Promise<BalanceResponse | null> {
   }
 
   try {
-    const res = await fetchWithAuth(`/api/v1/balances/${groupId}`, {
+    const res = await fetchWithAuth(`/balances/${groupId}`, {
       cache: 'no-store',
     })
 
