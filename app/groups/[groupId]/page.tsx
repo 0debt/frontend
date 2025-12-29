@@ -1,7 +1,9 @@
+import { DeleteGroupButton } from "@/app/groups/DeleteGroupButton"
+import { EditGroupForm } from "@/app/groups/EditGroupForm"
+import { GroupMembersManager } from "@/app/groups/GroupMembersManager"
 import { fetchWithAuth } from "@/app/lib/api"
 import { isMockEnabled } from "@/app/lib/mock"
 import { Link } from "next-view-transitions"
-
 type Props = { params: Promise<{ groupId: string }> }
 
 type GroupSummary = {
@@ -34,6 +36,9 @@ export default async function GroupDetailPage({ params }: Props) {
           <p className="text-sm opacity-70">Totale speso: —</p>
           <p className="text-sm opacity-70">Membri: 3</p>
         </div>
+        <EditGroupForm groupId={groupId} />
+        <GroupMembersManager groupId={groupId} initialMembers={["giulia@mail.com", "luigi@mail.com"]} />
+        <DeleteGroupButton groupId={groupId} />
       </main>
     )
   }
@@ -68,6 +73,14 @@ export default async function GroupDetailPage({ params }: Props) {
           </ul>
         </section>
       </div>
+      <EditGroupForm
+      groupId={groupId}
+      initialName={summary.name}
+      initialDescription={summary.description || ""}
+    />
+    <GroupMembersManager groupId={groupId} initialMembers={summary.members} />
+    <DeleteGroupButton groupId={groupId} />
+
     </main>
   )
 }
