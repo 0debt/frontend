@@ -1,40 +1,42 @@
 'use client';
 
-import { getNotifications, type NotificationItem } from '@/app/lib/api/notifications';
-import { useAuth } from '@/app/providers/AuthProvider'; //
+import { getNotifications, markAsRead, type NotificationItem } from '@/app/lib/api/notifications';
+import { useAuth } from '@/app/providers/AuthProvider';
 import { Button } from '@/shadcn/components/ui/button';
 import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
 } from '@/shadcn/components/ui/popover';
 import { ScrollArea } from '@/shadcn/components/ui/scroll-area';
-import { Bell } from 'lucide-react';
+import { Bell, Check } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 export function NotificationBell() {
-  const { user, isAuthenticated } = useAuth(); //
+  const { user, isAuthenticated } = useAuth();
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [isOpen, setIsOpen] = useState(false);
 
-  // Cargar notificaciones al montar/cambiar de usuario (para F5)...
+  // Cargar notificaciones
   useEffect(() => {
-    if (!isAuthenticated || !user?.id) return;
+    if (!user?.id) return;
     getNotifications(user.id).then(setNotifications);
-  }, [isAuthenticated, user?.id]);
+  }, [user?.id, isAuthenticated, isOpen]);
 
-  // ...y refrescar al abrir el popover
-  useEffect(() => {
-    if (!isOpen) return;
-    if (!isAuthenticated || !user?.id) return;
-    getNotifications(user.id).then(setNotifications);
-  }, [isOpen, isAuthenticated, user?.id]);
+  // 👇 LÓGICA NUEVA: Al hacer clic, marcamos como leído
+  const handleNotificationClick = async (notificationId: string) => {
+    // 1. Actualización visual instantánea (quita el punto rojo y el fondo azul ya)
+    setNotifications(prev => 
+      prev.map(n => n._id === notificationId ? { ...n, read: true } : n)
+    );
 
-  // Si no está logueado, no mostramos nada
-  if (!isAuthenticated) return null;
+    // 2. Guardamos en la base de datos
+    await markAsRead(notificationId);
+  };
 
-  // Contamos las no leídas
   const unreadCount = notifications.filter((n) => !n.read).length;
+
+  if (!isAuthenticated && !process.env.MOCK_AUTH) return null;
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen}>
@@ -50,10 +52,12 @@ export function NotificationBell() {
       <PopoverContent className="w-80 p-0" align="end">
         <div className="flex items-center justify-between px-4 py-3 border-b bg-muted/20">
           <h4 className="font-semibold text-sm">Notificaciones</h4>
-          {unreadCount > 0 && (
+          {unreadCount > 0 ? (
             <span className="text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full">
               {unreadCount} nuevas
             </span>
+          ) : (
+             <span className="text-xs text-muted-foreground">Todo leído</span>
           )}
         </div>
         <ScrollArea className="h-[300px]">
@@ -67,12 +71,28 @@ export function NotificationBell() {
               {notifications.map((n) => (
                 <div 
                   key={n._id} 
-                  className={`p-4 border-b text-sm hover:bg-muted/50 transition-colors ${!n.read ? 'bg-blue-50/50 dark:bg-blue-900/10' : ''}`}
+                  // 👇 AQUI ESTÁ LA MAGIA DEL CLIC
+                  onClick={() => !n.read && handleNotificationClick(n._id)}
+                  className={`
+                    relative flex flex-col p-4 border-b text-sm transition-all duration-200
+                    ${!n.read 
+                        ? 'bg-blue-50/50 dark:bg-blue-900/20 cursor-pointer hover:bg-blue-100/50' 
+                        : 'opacity-60'
+                    }
+                  `}
                 >
-                  <p className="leading-relaxed">{n.message}</p>
+                  <div className="flex justify-between items-start gap-2">
+                      <p className={`leading-relaxed ${!n.read ? 'font-medium' : ''}`}>
+                        {n.message}
+                      </p>
+                      {n.read && <Check className="h-3 w-3 text-muted-foreground mt-1" />}
+                  </div>
                   <p className="mt-1 text-xs text-muted-foreground">
                     {new Date(n.createdAt).toLocaleDateString()}
                   </p>
+                  {!n.read && (
+                    <span className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500 rounded-r-full" />
+                  )}
                 </div>
               ))}
             </div>

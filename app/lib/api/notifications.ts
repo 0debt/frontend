@@ -1,4 +1,4 @@
-// frontend/app/lib/api/notifications.ts
+import { withApiBase } from '@/app/lib/config';
 
 export interface NotificationItem {
   _id: string;
@@ -8,18 +8,17 @@ export interface NotificationItem {
   createdAt: string;
 }
 
-import { withApiBase } from '@/app/lib/config';
-
 /**
  * Obtiene notificaciones desde el Client Component.
- * Usa una URL absoluta basada en el entorno para evitar errores 404 en local.
  */
 export async function getNotifications(userId: string): Promise<NotificationItem[]> {
   try {
-    // Usamos la ruta interna de Next para que el servidor añada el JWT
+    // Usamos la ruta interna de Next (/api/...)
     const url = withApiBase(`/api/notifications/${userId}`, '');
-    console.log('🔍 FETCHING URL (proxy):', url);
-    const res = await fetch(url);
+    console.log('🔍 FETCHING URL:', url);
+    
+    // 🔥 IMPORTANTE: cache: 'no-store' obliga a pedir datos frescos siempre
+    const res = await fetch(url, { cache: 'no-store' });
     
     if (!res.ok) {
       console.error('Error fetching notifications:', res.status, res.statusText);
@@ -30,5 +29,33 @@ export async function getNotifications(userId: string): Promise<NotificationItem
   } catch (error) {
     console.error('Error de red al buscar notificaciones:', error);
     return [];
+  }
+}
+
+/**
+ * Marca una notificación como leída
+ */
+export async function markAsRead(notificationId: string): Promise<boolean> {
+  try {
+    // Volvemos a usar el estándar /api/...
+    const url = withApiBase(`/api/notifications/${notificationId}/read`, '');
+    
+    const res = await fetch(url, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      cache: 'no-store' // Evitamos caché en la respuesta de la actualización
+    });
+
+    if (!res.ok) {
+      console.error('Error marcando como leída:', res.status);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error de red al marcar como leída:', error);
+    return false;
   }
 }
