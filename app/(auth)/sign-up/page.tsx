@@ -5,14 +5,31 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/sha
 import { Input } from "@/shadcn/components/ui/input"
 import { Label } from "@/shadcn/components/ui/label"
 import Link from "next/link"
-import { useActionState } from "react"
+import { useActionState, useEffect, useState } from "react"
 import { signup } from "@/app/actions/auth"
+import { NotificationPreferences } from "./notificationPreferences"
 
 export default function SignUpPage() {
   const [state, action, pending] = useActionState(signup, null)
+  const [showPreferences, setShowPreferences] = useState(false)
+
+  useEffect(() => {
+    if (state?.success && state?.userId && state?.email) {
+      setShowPreferences(true)
+    }
+  }, [state])
 
   return (
     <main className="flex min-h-screen items-center justify-center px-4">
+      {showPreferences && state?.userId && state?.email && (
+        <NotificationPreferences 
+          userId={state.userId}
+          email={state.email}
+          onClose={() => setShowPreferences(false)}
+        />
+      )}
+      
+      {!showPreferences && (
       <Card className="w-full max-w-md border-none shadow-none">
         <CardHeader className="text-center space-y-2">
           <CardTitle className="text-3xl font-semibold">Create your account</CardTitle>
@@ -76,6 +93,7 @@ export default function SignUpPage() {
           </form>
         </CardContent>
       </Card>
+      )}
     </main>
   )
 }
