@@ -53,7 +53,7 @@ export async function login(
  * Server Action for user registration
  * @param prevState - Previous form state
  * @param formData - Form data containing name, email and password
- * @returns Error state or success with userId/email
+ * @returns Error state or success with userId/email to notification preferences
  */
 export async function signup(
   prevState: AuthState,
