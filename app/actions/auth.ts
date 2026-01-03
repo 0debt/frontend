@@ -3,10 +3,13 @@
 import { fetchApi, fetchWithAuth } from '@/app/lib/api'
 import { createSession, deleteSession, getSessionToken } from '@/app/lib/session'
 import { redirect } from 'next/navigation'
+import { isMockEnabled, MOCK_USER } from '@/app/lib/mock'
 
 export type AuthState = {
   error?: string
   success?: boolean
+  userId?: string
+  email?: string
 } | null
 
 /**
@@ -50,7 +53,7 @@ export async function login(
  * Server Action for user registration
  * @param prevState - Previous form state
  * @param formData - Form data containing name, email and password
- * @returns Error state or redirects to /me on success
+ * @returns Error state or success with userId/email to notification preferences
  */
 export async function signup(
   prevState: AuthState,
@@ -76,6 +79,8 @@ export async function signup(
       return { error: data.error || 'Failed to create account' }
     }
 
+    const registerData = await resRegister.json()
+
     // 2. Auto-login after registration
     const resLogin = await fetchApi('/auth/login', {
       method: 'POST',
@@ -86,13 +91,18 @@ export async function signup(
       return { error: 'Account created. Please sign in.' }
     }
 
-    const { token } = await resLogin.json()
+    const { token, user } = await resLogin.json()
     await createSession(token)
+
+    // Return success with userId and email for preferences
+    return { 
+      success: true, 
+      userId: user?.id || registerData?.user?.id || registerData?.id,
+      email 
+    }
   } catch {
     return { error: 'Connection error. Please try again.' }
   }
-
-  redirect('/me')
 }
 
 /**
