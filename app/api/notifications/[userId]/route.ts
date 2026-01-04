@@ -1,21 +1,29 @@
-import { fetchWithAuth } from '@/app/lib/api'
-import { NextRequest } from 'next/server'
+import { fetchWithAuth } from "@/app/lib/api"
+import { isMockEnabled } from "@/app/lib/mock"
+import { NextRequest } from "next/server"
 
 export async function GET(
   _req: NextRequest,
   context: { params: Promise<{ userId: string }> }
 ) {
   const { userId } = await context.params
-  const upstreamPath = `/notifications/${userId}`
 
+  // ✅ In mock: non chiamiamo il gateway, ritorniamo "nessuna notifica"
+  if (isMockEnabled) {
+    return new Response(JSON.stringify([]), {
+      status: 200,
+      headers: { "content-type": "application/json" },
+    })
+  }
+
+  const upstreamPath = `/notifications/${userId}`
   const res = await fetchWithAuth(upstreamPath)
   const body = await res.text()
 
   return new Response(body, {
     status: res.status,
     headers: {
-      'content-type': res.headers.get('content-type') || 'application/json',
+      "content-type": res.headers.get("content-type") || "application/json",
     },
   })
 }
-
