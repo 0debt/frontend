@@ -19,7 +19,7 @@
 # Install dependencies
 bun install
 
-# Run development server
+# Run development server with Mock Data (Default)
 bun dev
 
 # Build for production
@@ -34,6 +34,7 @@ bun build && bun start
 |-------|------|
 | **Runtime** | Bun |
 | **Framework** | Next.js 16 (App Router) + React 19 |
+| **Data Fetching** | Server Actions + `fetchWithAuth` |
 | **UI Components** | Shadcn UI + Radix Primitives |
 | **Styling** | TailwindCSS |
 | **Auth** | JWT (HttpOnly cookies) |
@@ -45,30 +46,37 @@ bun build && bun start
 
 ```
 app/
-├── (auth)/          # Auth pages (sign-in, sign-up)
-├── api/             # Internal API routes (proxy to gateway)
-├── components/      # Shared UI components
-├── lib/             # Utils, config, API clients
-├── budgets/         # Budget management pages
-├── groups/          # Group management pages
-└── me/              # User profile
+├── (auth)/          # Authentication pages (sign-in, sign-up)
+├── (users)/         # User profile pages (/me)
+├── actions/         # Server Actions (Backend mutations & logic)
+├── budgets/         # Budget management modules
+├── components/      # Shared application components
+├── expenses/        # Expense tracking & settling
+├── groups/          # Group management & details
+├── lib/
+│   ├── api.ts       # Secure API client
+│   ├── mock-data/   # Offline development data
+│   └── session.ts   # Cookie session management
+└── providers/       # Context providers (Auth, Theme)
+
+shadcn/              # UI Component Library (Buttons, Dialogs, etc.)
 ```
 
 ---
 
 ## 🔌 API Architecture
 
-All API calls are routed through Kong API Gateway. The frontend never calls microservices directly.
+All backend interactions are secured and routed through Server Actions, acting as a secure bridge to the Kong API Gateway.
 
 ```
-┌─────────────────┐     ┌──────────────────┐     ┌─────────────────┐
-│   Client (UI)   │ ──► │  Next.js API     │ ──► │  Kong Gateway   │
-│                 │     │  (JWT injection) │     │                 │
-└─────────────────┘     └──────────────────┘     └─────────────────┘
+┌─────────────────┐     ┌──────────────────────┐     ┌─────────────────┐
+│   Client (UI)   │ ──► │ Next.js Server Action│ ──► │  Kong Gateway   │
+│ (Interactivity) │     │ (Auth & Validation)  │     │ (Microservices) │
+└─────────────────┘     └──────────────────────┘     └─────────────────┘
 ```
 
-- **Server Components / Actions**: Use `fetchWithAuth()` directly
-- **Client Components**: Call internal `/api/*` routes that proxy to Kong with JWT attached
+- **Server Components**: Call `fetchWithAuth()` directly to render data on the server.
+- **Client Components**: Trigger **Server Actions** (`app/actions/*.ts`) to perform mutations (Create, Update, Delete). We avoid exposing direct API proxy routes to the client.
 
 ---
 
@@ -76,9 +84,11 @@ All API calls are routed through Kong API Gateway. The frontend never calls micr
 
 | Variable | Description |
 |----------|-------------|
-| `API_GATEWAY_URL` | Gateway URL (auto-exposed as `NEXT_PUBLIC_API_GATEWAY_URL`) |
+| `API_GATEWAY_URL` | Gateway URL (e.g., `http://api-gateway:8000`) |
+| `NEXT_PUBLIC_MOCK_AUTH` | Enable Mock Auth (`true`/`false`) |
+| `NEXT_PUBLIC_MOCK_GROUPS` | Enable Mock Groups Data (`true`/`false`) |
 
-Default: `http://api-gateway:8000`
+See `.env.example` for the full list of flags.
 
 ---
 
