@@ -47,7 +47,7 @@ export default async function MarketingPage() {
       </p>
       <Button className="mt-8" asChild>
         <Link href={userName ? "/groups" : "/sign-in"}>
-          {userName ? "Go to dashboard" : "Get started"}
+          {userName ? "Go to groups" : "Get started"}
         </Link>
       </Button>
       </main>
