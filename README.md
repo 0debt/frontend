@@ -13,13 +13,10 @@
 
 ---
 
-## ⚡ Quick Start
-
-```bash
 # Install dependencies
 bun install
 
-# Run development server with Mock Data (Default)
+# Run development server
 bun dev
 
 # Build for production
@@ -82,11 +79,15 @@ All backend interactions are secured and routed through Server Actions, acting a
 
 ## 🔧 Environment
 
-| Variable | Description |
-|----------|-------------|
-| `API_GATEWAY_URL` | Gateway URL (e.g., `http://api-gateway:8000`) |
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `API_GATEWAY_URL` | Gateway URL (e.g., `http://api-gateway:8000`) | Required |
+| `MOCK_AUTH` | Enable Mock Auth | `false` |
+| `MOCK_GROUPS` | Enable Mock Groups Data | `false` |
+| `MOCK_EXPENSES` | Enable Mock Expenses Data | `false` |
+| `MOCK_BUDGETS` | Enable Mock Budgets Data | `false` |
 
-See `.env.example` for the full list of flags.
+To enable mock mode for offline development, set the specific flags to `true` in your `.env` file.
 
 ---
 
