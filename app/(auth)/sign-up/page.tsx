@@ -3,11 +3,12 @@
 import { Button } from "@/shadcn/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shadcn/components/ui/card"
 import { Input } from "@/shadcn/components/ui/input"
+import { PasswordInput } from "@/app/components/PasswordInput"
 import { Label } from "@/shadcn/components/ui/label"
 import Link from "next/link"
 import { useActionState, useEffect, useState } from "react"
 import { signup } from "@/app/actions/auth"
-import { NotificationPreferences } from "./notificationPreferences"
+import { NotificationPreferencesModal } from "@/app/components/NotificationPreferencesModal"
 
 export default function SignUpPage() {
   const [state, action, pending] = useActionState(signup, null)
@@ -15,17 +16,20 @@ export default function SignUpPage() {
 
   useEffect(() => {
     if (state?.success && state?.userId && state?.email) {
-      setShowPreferences(true)
+      const t = setTimeout(() => setShowPreferences(true), 0)
+      return () => clearTimeout(t)
     }
   }, [state])
 
   return (
     <main className="flex min-h-screen items-center justify-center px-4">
       {showPreferences && state?.userId && state?.email && (
-        <NotificationPreferences 
+        <NotificationPreferencesModal 
           userId={state.userId}
           email={state.email}
+          isOpen={true}
           onClose={() => setShowPreferences(false)}
+          mode="onboarding"
         />
       )}
       
@@ -66,10 +70,9 @@ export default function SignUpPage() {
 
             <div className="space-y-2">
               <Label htmlFor="password">Password *</Label>
-              <Input
+              <PasswordInput
                 id="password"
                 name="password"
-                type="password"
                 placeholder="••••••••"
                 className="h-12 text-base"
                 required

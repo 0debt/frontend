@@ -1,9 +1,10 @@
-import { fetchWithAuth } from "@/app/lib/api"
-import { isMockEnabled, MOCK_USER } from "@/app/lib/mock"
-import { getSession } from "@/app/lib/session"
-import { Card, CardDescription, CardHeader, CardTitle } from "@/shadcn/components/ui/card"
-import { redirect } from "next/navigation"
-import EditProfileForm from "./edit-profile-form"
+import { fetchWithAuth } from "@/app/lib/api";
+import { isMockAuthEnabled as isMockEnabled, MOCK_USER } from "@/app/lib/mock-data/auth";
+
+import { getSession } from "@/app/lib/session";
+import { Card } from "@/shadcn/components/ui/card";
+import { redirect } from "next/navigation";
+import EditProfileForm from "./edit-profile-form";
 
 export default async function EditProfilePage() {
   let user
@@ -23,29 +24,21 @@ export default async function EditProfilePage() {
     }
 
     if (!res.ok) {
-      return (
-        <main className="container mx-auto max-w-2xl px-4 py-12">
-          <p className="text-red-500">Error loading profile.</p>
-        </main>
-      )
+      throw new Error("Failed to load profile")
     }
 
     user = await res.json()
   }
 
   return (
-    <main className="container mx-auto max-w-2xl px-4 py-12">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold">Edit Profile</h1>
-        <p className="mt-2 text-muted-foreground">
+    <main className="container mx-auto max-w-xl px-4 py-6">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold">Edit profile</h1>
+        <p className="text-sm text-muted-foreground">
           Update your personal information.
         </p>
       </div>
       <Card>
-        <CardHeader>
-          <CardTitle>Edit Account Details</CardTitle>
-          <CardDescription>Modify your 0debt account information</CardDescription>
-        </CardHeader>
         <EditProfileForm user={user} />
       </Card>
     </main>
