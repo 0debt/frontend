@@ -1,35 +1,25 @@
 'use client'
 
-import { deleteBudget } from '@/app/actions/budgets'
-import { Budget, BudgetStatus } from '@/app/lib/mock'
+import { Budget, BudgetStatus } from '@/app/lib/mock-data/budgets'
 import { Badge } from '@/shadcn/components/ui/badge'
 import { Button } from '@/shadcn/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shadcn/components/ui/card'
-import {
-    Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
-    DialogTrigger,
-} from '@/shadcn/components/ui/dialog'
 import { Progress } from '@/shadcn/components/ui/progress'
 import { Link } from 'next-view-transitions'
-import React, { useTransition } from 'react'
+import React from 'react'
+import { DeleteBudgetButton } from './DeleteBudgetButton'
 
-const formatEUR = (value: number) =>
-  new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR' }).format(value)
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'EUR' }).format(value)
+  }
 
 type BudgetCardProps = {
   budget: Budget
   status?: BudgetStatus
+  groupName?: string
 }
 
-export function BudgetCard({ budget, status }: BudgetCardProps) {
-  const [isPending, startTransition] = useTransition()
-  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = React.useState(false)
-
+export function BudgetCard({ budget, status, groupName }: BudgetCardProps) {
   const percentage = status ? Math.min((status.spent / status.limit) * 100, 100) : 0
 
   const getHealthBadgeVariant = (health?: BudgetStatus['health']) => {
@@ -45,12 +35,6 @@ export function BudgetCard({ budget, status }: BudgetCardProps) {
     }
   }
 
-  const handleDelete = () => {
-    startTransition(() => {
-      deleteBudget(budget._id)
-    })
-  }
-
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardHeader>
@@ -60,10 +44,10 @@ export function BudgetCard({ budget, status }: BudgetCardProps) {
               {budget.category || 'General'}
             </CardTitle>
             <CardDescription className="mt-1">
-              {budget.period} • Limit: {formatEUR(budget.limitAmount)}
+              {budget.period} • Limit: {formatCurrency(budget.limitAmount)}
             </CardDescription>
             <CardDescription className="mt-1 text-xs text-muted-foreground">
-              Group: {budget.groupId}
+              Group: {groupName || budget.groupId}
             </CardDescription>
           </div>
           {status && (
@@ -80,7 +64,7 @@ export function BudgetCard({ budget, status }: BudgetCardProps) {
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Spent</span>
                 <span className="font-medium">
-                  {formatEUR(status.spent)} / {formatEUR(status.limit)}
+                  {formatCurrency(status.spent)} / {formatCurrency(status.limit)}
                 </span>
               </div>
               <Progress value={percentage} />
@@ -89,42 +73,18 @@ export function BudgetCard({ budget, status }: BudgetCardProps) {
         )}
         <div className="flex gap-2 mt-4">
           <Button asChild variant="outline" size="sm" className="flex-1">
-            <Link href={`/budgets/${budget._id}`}>View</Link>
+            <Link href={`/budgets/view?budgetId=${budget._id}&groupId=${budget.groupId}`}>View</Link>
           </Button>
           <Button asChild variant="ghost" size="sm">
-            <Link href={`/budgets/${budget._id}/edit`}>Edit</Link>
+            <Link href={`/budgets/edit?budgetId=${budget._id}&groupId=${budget.groupId}`}>Edit</Link>
           </Button>
-          <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
-            <DialogTrigger asChild>
-              <Button variant="ghost" size="sm" className="text-destructive hover:text-destructive">
-                Delete
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Delete Budget</DialogTitle>
-                <DialogDescription>
-                  Are you sure you want to delete this budget? This action cannot be undone.
-                </DialogDescription>
-              </DialogHeader>
-              <DialogFooter>
-                <Button
-                  variant="outline"
-                  onClick={() => setIsDeleteDialogOpen(false)}
-                  disabled={isPending}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  variant="destructive"
-                  onClick={handleDelete}
-                  disabled={isPending}
-                >
-                  {isPending ? 'Deleting...' : 'Delete'}
-                </Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+          <DeleteBudgetButton 
+            budgetId={budget._id} 
+            variant="ghost" 
+            size="sm" 
+            className="text-destructive hover:text-destructive" 
+            showIcon={false} 
+          />
         </div>
       </CardContent>
     </Card>

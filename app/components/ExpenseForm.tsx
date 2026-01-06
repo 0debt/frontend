@@ -1,39 +1,54 @@
 'use client'
 
-import { createExpense, ExpenseActionState } from '@/app/actions/expenses'
+import { createExpense, deleteExpense, ExpenseActionState, updateExpense } from '@/app/actions/expenses'
+import { NumberInput } from '@/app/components/NumberInput'
 import {
-    ExpenseCategory,
-    formatCurrency,
-    getUserAvatar,
-    SplitType,
-    UserInfo,
+  Expense,
+  ExpenseCategory,
+  formatCurrency,
+  getUserAvatar,
+  SplitType,
+  UserInfo,
 } from '@/app/lib/expenses'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/shadcn/components/ui/alert-dialog'
+import { Avatar, AvatarFallback, AvatarImage } from '@/shadcn/components/ui/avatar'
 import { Badge } from '@/shadcn/components/ui/badge'
 import { Button } from '@/shadcn/components/ui/button'
 import { Input } from '@/shadcn/components/ui/input'
 import { Label } from '@/shadcn/components/ui/label'
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from '@/shadcn/components/ui/select'
-import { AlertCircle, Check } from 'lucide-react'
-import Image from 'next/image'
+import { AlertCircle, Check, Trash2 } from 'lucide-react'
 import { useActionState, useEffect, useState } from 'react'
 
 type ExpenseFormProps = {
   groupId: string
   members: UserInfo[]
   currentUserId: string
+  initialData?: Expense
+  onSuccess?: () => void
 }
 
 const CATEGORIES: { value: ExpenseCategory; label: string; icon: string }[] = [
   { value: 'FOOD', label: 'Food & Drinks', icon: '🍔' },
   { value: 'TRANSPORT', label: 'Transport', icon: '🚗' },
   { value: 'ACCOMMODATION', label: 'Accommodation', icon: '🏨' },
-  { value: 'ENTERTAINAMENT', label: 'Entertainment', icon: '🎬' },
+  { value: 'ENTERTAINMENT', label: 'Entertainment', icon: '🎬' },
   { value: 'OTHER', label: 'Other', icon: '📦' },
 ]
 
@@ -50,36 +65,89 @@ const SPLIT_TYPES: { value: SplitType; label: string; description: string }[] = 
   { value: 'PERCENTAGE', label: 'By Percentage', description: 'Split by percentages' },
 ]
 
-export function ExpenseForm({ groupId, members, currentUserId }: ExpenseFormProps) {
+export function ExpenseForm({ groupId, members, currentUserId, initialData, onSuccess }: ExpenseFormProps) {
+  // Helper function to normalize decimal format (comma to dot)
+  const normalizeNumber = (value: string | number | undefined): number => {
+    if (value === undefined || value === '') return 0
+    if (typeof value === 'number') return value
+    return parseFloat(value.replace(/\./g, '').replace(',', '.'))
+  }
+
+  // Bind update action if initialData exists
+  const updateAction = initialData
+    ? (prevState: ExpenseActionState, formData: FormData) =>
+        updateExpense(initialData._id, groupId, prevState, formData)
+    : createExpense
+
   const [state, formAction, isPending] = useActionState<ExpenseActionState, FormData>(
-    createExpense,
+    updateAction,
     null
   )
 
-  const [payerId, setPayerId] = useState(currentUserId)
+  const [payerId, setPayerId] = useState(initialData?.payerId || currentUserId)
   const [selectedParticipants, setSelectedParticipants] = useState<string[]>(
-    members.map(m => m._id)
+    initialData ? initialData.shares.map(s => s.userId) : members.map(m => m._id)
   )
-  const [splitType, setSplitType] = useState<SplitType>('EQUAL')
-  const [totalAmount, setTotalAmount] = useState('')
-  const [currency, setCurrency] = useState('EUR')
-  const [exactAmounts, setExactAmounts] = useState<Record<string, string>>({})
-  const [percentages, setPercentages] = useState<Record<string, string>>({})
+  const [splitType, setSplitType] = useState<SplitType>(initialData?.splitType || 'EQUAL')
+  const [totalAmount, setTotalAmount] = useState<number | undefined>(initialData?.totalAmount)
+  const [currency, setCurrency] = useState(initialData?.currency || 'EUR')
+  const [category, setCategory] = useState<ExpenseCategory>(initialData?.category || 'OTHER')
+  
+  // Initialize exactAmounts from initialData if EXACT split type
+  const [exactAmounts, setExactAmounts] = useState<Record<string, string>>(() => {
+    if (initialData?.splitType === 'EXACT' && initialData.shares) {
+      const exacts: Record<string, string> = {}
+      initialData.shares.forEach(s => {
+        exacts[s.userId] = s.amount.toString()
+      })
+      return exacts
+    }
+    return {}
+  })
+  
+  // Initialize percentages from initialData if PERCENTAGE split type
+  const [percentages, setPercentages] = useState<Record<string, string>>(() => {
+    if (initialData?.splitType === 'PERCENTAGE' && initialData.shares) {
+      const pcts: Record<string, string> = {}
+      const total = initialData.totalAmount
+      initialData.shares.forEach(s => {
+        const pct = (s.amount / total) * 100
+        pcts[s.userId] = Math.round(pct).toString()
+      })
+      return pcts
+    }
+    return {}
+  })
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false)
+
+  useEffect(() => {
+    if (state?.success && onSuccess) {
+      onSuccess()
+    }
+  }, [state, onSuccess])
+
+  const handleDelete = async () => {
+    if (!initialData) return
+
+    await deleteExpense(initialData._id, groupId)
+    setShowDeleteDialog(false)
+    if (onSuccess) onSuccess()
+  }
 
   // Calcular el share igual
   const equalShare = selectedParticipants.length > 0 && totalAmount
-    ? parseFloat(totalAmount) / selectedParticipants.length
+    ? totalAmount / selectedParticipants.length
     : 0
 
   // Calcular total de exact amounts
   const totalExact = Object.entries(exactAmounts)
     .filter(([userId]) => selectedParticipants.includes(userId))
-    .reduce((sum, [, amount]) => sum + (parseFloat(amount) || 0), 0)
+    .reduce((sum, [, amount]) => sum + (normalizeNumber(amount || '0')), 0)
 
   // Calcular total de porcentajes
   const totalPercentage = Object.entries(percentages)
     .filter(([userId]) => selectedParticipants.includes(userId))
-    .reduce((sum, [, pct]) => sum + (parseFloat(pct) || 0), 0)
+    .reduce((sum, [, pct]) => sum + (normalizeNumber(pct || '0')), 0)
 
   const toggleParticipant = (userId: string) => {
     setSelectedParticipants(prev =>
@@ -89,13 +157,21 @@ export function ExpenseForm({ groupId, members, currentUserId }: ExpenseFormProp
     )
   }
 
-  // Reset exact/percentage cuando cambia el split type
-  useEffect(() => {
-    if (splitType === 'EQUAL') {
-      setExactAmounts({})
-      setPercentages({})
+  // Validate form before submit
+  const isFormValid = () => {
+    if (selectedParticipants.length === 0) return false
+    if (!totalAmount) return false
+
+    if (splitType === 'EXACT') {
+      return Math.abs(totalExact - totalAmount) < 0.01
     }
-  }, [splitType])
+
+    if (splitType === 'PERCENTAGE') {
+      return Math.abs(totalPercentage - 100) < 0.01
+    }
+
+    return true
+  }
 
   return (
     <form action={formAction} className="space-y-6">
@@ -109,7 +185,7 @@ export function ExpenseForm({ groupId, members, currentUserId }: ExpenseFormProp
       {/* Error message */}
       {state?.error && (
         <div className="flex items-center gap-2 p-3 text-sm text-red-600 bg-red-50 rounded-lg">
-          <AlertCircle className="h-4 w-4 flex-shrink-0" />
+          <AlertCircle className="h-4 w-4 shrink-0" />
           <span>{state.error}</span>
         </div>
       )}
@@ -121,6 +197,7 @@ export function ExpenseForm({ groupId, members, currentUserId }: ExpenseFormProp
           id="description"
           name="description"
           placeholder="What was this expense for?"
+          defaultValue={initialData?.description}
           required
           disabled={isPending}
         />
@@ -130,17 +207,20 @@ export function ExpenseForm({ groupId, members, currentUserId }: ExpenseFormProp
       <div className="grid grid-cols-3 gap-4">
         <div className="col-span-2 space-y-2">
           <Label htmlFor="totalAmount">Amount</Label>
-          <Input
+          <NumberInput
             id="totalAmount"
             name="totalAmount"
-            type="number"
-            step="0.01"
-            min="0.01"
-            placeholder="0.00"
-            value={totalAmount}
-            onChange={(e) => setTotalAmount(e.target.value)}
+            allowNegative={false}
+            decimalSeparator=","
+            thousandSeparator="."
+            decimalScale={2}
+            fixedDecimalScale
+            min={0.01}
+            placeholder="0,00"
             required
             disabled={isPending}
+            value={totalAmount}
+            onValueChange={(value) => setTotalAmount(value)}
           />
         </div>
         <div className="space-y-2">
@@ -163,7 +243,7 @@ export function ExpenseForm({ groupId, members, currentUserId }: ExpenseFormProp
       {/* Category */}
       <div className="space-y-2">
         <Label>Category</Label>
-        <Select name="category" defaultValue="OTHER" disabled={isPending}>
+        <Select name="category" value={category} onValueChange={(value) => setCategory(value as ExpenseCategory)} disabled={isPending}>
           <SelectTrigger>
             <SelectValue />
           </SelectTrigger>
@@ -196,13 +276,10 @@ export function ExpenseForm({ groupId, members, currentUserId }: ExpenseFormProp
                   : 'border-border hover:bg-accent'
               }`}
             >
-              <Image
-                src={getUserAvatar(member._id, members)}
-                alt={member.name}
-                width={32}
-                height={32}
-                className="rounded-full"
-              />
+              <Avatar className="h-8 w-8">
+                <AvatarImage src={getUserAvatar(member._id, members)} alt={member.name} />
+                <AvatarFallback>{member.name[0]?.toUpperCase()}</AvatarFallback>
+              </Avatar>
               <span className="font-medium">{member.name}</span>
               {payerId === member._id && (
                 <Check className="h-4 w-4 text-primary ml-auto" />
@@ -265,13 +342,10 @@ export function ExpenseForm({ groupId, members, currentUserId }: ExpenseFormProp
                   }`}>
                     {isSelected && <Check className="h-3 w-3 text-primary-foreground" />}
                   </div>
-                  <Image
-                    src={getUserAvatar(member._id, members)}
-                    alt={member.name}
-                    width={32}
-                    height={32}
-                    className="rounded-full"
-                  />
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={getUserAvatar(member._id, members)} alt={member.name} />
+                    <AvatarFallback>{member.name[0]?.toUpperCase()}</AvatarFallback>
+                  </Avatar>
                   <span className="font-medium">{member.name}</span>
                 </button>
 
@@ -329,12 +403,12 @@ export function ExpenseForm({ groupId, members, currentUserId }: ExpenseFormProp
         {/* Validation feedback for EXACT */}
         {splitType === 'EXACT' && totalAmount && (
           <div className={`text-sm ${
-            Math.abs(totalExact - parseFloat(totalAmount)) < 0.01 
-              ? 'text-green-600' 
+            Math.abs(totalExact - totalAmount) < 0.01
+              ? 'text-green-600'
               : 'text-amber-600'
           }`}>
-            Total: {formatCurrency(totalExact)} / {formatCurrency(parseFloat(totalAmount))}
-            {Math.abs(totalExact - parseFloat(totalAmount)) < 0.01 && ' ✓'}
+            Total: {formatCurrency(totalExact)} / {formatCurrency(totalAmount)}
+            {Math.abs(totalExact - totalAmount) < 0.01 && ' \u2713'}
           </div>
         )}
 
@@ -351,10 +425,41 @@ export function ExpenseForm({ groupId, members, currentUserId }: ExpenseFormProp
         )}
       </div>
 
-      {/* Submit */}
+      {/* Submit & Delete */}
       <div className="flex gap-4 pt-4">
-        <Button type="submit" className="flex-1" disabled={isPending || selectedParticipants.length === 0}>
-          {isPending ? 'Creating...' : 'Add Expense'}
+        {initialData && (
+          <AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+            <AlertDialogTrigger asChild>
+              <Button
+                type="button"
+                variant="destructive"
+                size="icon"
+                disabled={isPending}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete Expense</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Are you sure you want to delete this expense? This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleDelete}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  Delete
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
+        <Button type="submit" className="flex-1" disabled={isPending || !isFormValid()}>
+          {isPending ? 'Saving...' : (initialData ? 'Save changes' : 'Add expense')}
         </Button>
       </div>
     </form>

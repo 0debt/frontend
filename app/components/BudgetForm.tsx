@@ -2,7 +2,8 @@
 
 import { BudgetActionState, createBudget, updateBudget } from '@/app/actions/budgets'
 import { NumberInput } from '@/app/components/NumberInput'
-import { Budget } from '@/app/lib/mock'
+import { Budget } from '@/app/lib/mock-data/budgets'
+import { Group } from '@/app/lib/mock-data/groups'
 import { Button } from '@/shadcn/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shadcn/components/ui/card'
 import { Input } from '@/shadcn/components/ui/input'
@@ -19,14 +20,16 @@ import { useActionState, useState } from 'react'
 type BudgetFormProps = {
   budget?: Budget
   mode: 'create' | 'edit'
+  groups?: Group[]
 }
 
-export function BudgetForm({ budget, mode }: BudgetFormProps) {
-  const action = mode === 'create' ? createBudget : (prevState: BudgetActionState, formData: FormData) => 
+export function BudgetForm({ budget, mode, groups = [] }: BudgetFormProps) {
+  const action = mode === 'create' ? createBudget : (prevState: BudgetActionState, formData: FormData) =>
     updateBudget(budget!._id, prevState, formData)
-  
+
   const [state, formAction, isPending] = useActionState(action, null)
   const [period, setPeriod] = useState(budget?.period || 'monthly')
+  const [selectedGroup, setSelectedGroup] = useState(budget?.groupId || groups[0]?._id || '')
 
   return (
     <Card>
@@ -40,6 +43,7 @@ export function BudgetForm({ budget, mode }: BudgetFormProps) {
       </CardHeader>
       <CardContent>
         <form action={formAction} className="space-y-4">
+          <input type="hidden" name="groupId" value={selectedGroup || budget?.groupId} />
           {mode === 'create' && (
             <div className="space-y-2">
               <Label htmlFor="category">Category (optional)</Label>
@@ -93,7 +97,23 @@ export function BudgetForm({ budget, mode }: BudgetFormProps) {
           )}
 
           {mode === 'create' && (
-            <input type="hidden" name="groupId" value="demo-group" />
+            <div className="space-y-2">
+              <Label htmlFor="groupId">
+                Group <span className="text-destructive">*</span>
+              </Label>
+              <Select value={selectedGroup} onValueChange={setSelectedGroup} required>
+                <SelectTrigger id="groupId" className="w-full">
+                  <SelectValue placeholder="Select a group" />
+                </SelectTrigger>
+                <SelectContent>
+                  {groups.map((group) => (
+                    <SelectItem key={group._id} value={group._id}>
+                      {group.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           )}
 
           {state?.error && (

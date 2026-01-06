@@ -11,14 +11,11 @@ type NavItem = {
 }
 
 const navItems: NavItem[] = [
-  { href: '/', label: 'Home' },
+  { href: '/', label: 'Home', requiresAuth: true },
+  { href: '/groups', label: 'Groups', requiresAuth: true },
   { href: '/expenses', label: 'Expenses', requiresAuth: true },
   { href: '/budgets', label: 'Budgets', requiresAuth: true },
-  { href: "/groups", label: "Groups" },
-  { href: '/docs', label: 'Docs' },
-  { href: '/demo-components', label: 'Demo Components' },
   { href: '/plans', label: 'Plans', requiresAuth: true },
-  
 ]
 
 type MainNavProps = {

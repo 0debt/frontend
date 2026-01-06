@@ -3,13 +3,14 @@
 import { MainNav } from '@/app/components/MainNav'
 import { useAuth } from '@/app/providers/AuthProvider'
 import { Button } from '@/shadcn/components/ui/button'
+import { Avatar, AvatarFallback, AvatarImage } from '@/shadcn/components/ui/avatar'
 import { Link } from 'next-view-transitions'
 import Image from 'next/image'
-// 👇 1. IMPORTAMOS LA CAMPANITA
+// 👇 1. IMPORT NOTIFICATION BELL
 import { NotificationBell } from './NotificationBell'
 
 export function Header() {
-  const { isAuthenticated } = useAuth()
+  const { isAuthenticated, user } = useAuth()
 
   return (
     <header className="border-b">
@@ -26,23 +27,30 @@ export function Header() {
           <MainNav isAuthenticated={isAuthenticated} />
         </div>
         
-        {/* Usuario NO logueado */}
+        {/* User NOT logged in */}
         {!isAuthenticated && (
           <div className="ml-auto flex items-center gap-4">
             <Button variant="ghost" asChild>
-              <Link href="/sign-in">Sign In</Link>
+              <Link href="/sign-in">Sign in</Link>
             </Button>
           </div>
         )}
 
-        {/* Usuario LOGUEADO */}
+        {/* User LOGGED IN */}
         {isAuthenticated && (
           <div className="ml-auto flex items-center gap-4">
-            {/* 👇 2. AQUÍ PONEMOS LA CAMPANA (antes del perfil) */}
+            {/* 👇 2. PLACE BELL HERE (before profile) */}
             <NotificationBell />
             
-            <Button variant="ghost" asChild>
-              <Link href="/me">Profile</Link>
+            <Button variant="ghost" className="h-8 w-8 rounded-full" asChild>
+              <Link href="/me">
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={user?.avatar} alt={user?.name || user?.email || 'User avatar'} />
+                  <AvatarFallback>
+                    {(user?.name || user?.email || 'U').charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+              </Link>
             </Button>
           </div>
         )}
