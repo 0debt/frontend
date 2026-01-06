@@ -22,7 +22,7 @@ export default function SignUpPage() {
   }, [state])
 
   return (
-    <main className="flex min-h-screen items-center justify-center px-4">
+    <main className="flex flex-1 items-center justify-center p-24">
       {showPreferences && state?.userId && state?.email && (
         <NotificationPreferencesModal 
           userId={state.userId}
@@ -34,7 +34,7 @@ export default function SignUpPage() {
       )}
       
       {!showPreferences && (
-      <Card className="w-full max-w-md border-none shadow-none">
+      <Card className="w-full max-w-md">
         <CardHeader className="text-center space-y-2">
           <CardTitle className="text-3xl font-semibold">Create your account</CardTitle>
           <CardDescription>
@@ -43,7 +43,7 @@ export default function SignUpPage() {
         </CardHeader>
 
         <CardContent>
-          <form action={action} className="space-y-6">
+          <form action={action} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">Full name *</Label>
               <Input
