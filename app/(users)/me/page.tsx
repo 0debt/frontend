@@ -1,11 +1,10 @@
 import { fetchWithAuth } from "@/app/lib/api"
-import { isMockEnabled, MOCK_USER } from "@/app/lib/mock"
+import { isMockAuthEnabled as isMockEnabled, MOCK_USER } from "@/app/lib/mock-data/auth";
+
 import { getSession } from "@/app/lib/session"
-import { logout } from "@/app/actions/auth"
 import { Card, CardDescription, CardHeader, CardTitle } from "@/shadcn/components/ui/card"
-import { Button } from "@/shadcn/components/ui/button"
-import Link from "next/link"
 import { redirect } from "next/navigation"
+import { ProfileActions } from "./ProfileActions"
 
 type User = {
   _id: string
@@ -36,64 +35,58 @@ export default async function ProfilePage() {
     }
 
     if (!res.ok) {
-      return (
-        <main className="container mx-auto max-w-2xl px-4 py-12">
-          <p className="text-red-500">Error loading profile. Please try again.</p>
-        </main>
-      )
+      throw new Error("Failed to load profile")
     }
 
     user = await res.json()
   }
 
   return (
-    <main className="container mx-auto max-w-2xl px-4 py-12">
+    <main className="container mx-auto max-w-2xl px-4 py-6">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold">My Profile</h1>
+        <h1 className="text-4xl font-bold">My profile</h1>
         <p className="mt-2 text-muted-foreground">
           Manage your personal information and account details.
         </p>
       </div>
 
       <Card>
-        <CardHeader>
-          <CardTitle>Account Details</CardTitle>
+        <CardHeader className="pb-4">
+          <CardTitle>Account details</CardTitle>
           <CardDescription>Your personal information on 0debt</CardDescription>
         </CardHeader>
 
-        <div className="p-6 space-y-4 text-sm">
-          <img
-            src={user.avatar}
-            alt={user.name}
-            className="w-20 h-20 rounded-full border shadow-sm"
+        <div className="px-6 pb-6 pt-2 text-sm">
+          <div className="flex justify-between items-start gap-6">
+            <div className="space-y-4 flex-1">
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Name:</span>
+                <span className="font-medium">{user.name}</span>
+              </div>
+
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Email:</span>
+                <span className="font-medium">{user.email}</span>
+              </div>
+
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Plan:</span>
+                <span className="font-medium capitalize">{user.plan}</span>
+              </div>
+            </div>
+
+            <img
+              src={user.avatar}
+              alt={user.name}
+              className="w-20 h-20 rounded-full border shadow-sm"
+            />
+          </div>
+
+          <ProfileActions 
+            userId={user._id} 
+            email={user.email} 
+            isMock={isMockEnabled} 
           />
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Name:</span>
-            <span className="font-medium">{user.name}</span>
-          </div>
-
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Email:</span>
-            <span className="font-medium">{user.email}</span>
-          </div>
-
-          <div className="flex justify-between">
-            <span className="text-muted-foreground">Plan:</span>
-            <span className="font-medium capitalize">{user.plan}</span>
-          </div>
-
-          <div className="pt-4 flex gap-2">
-            <Button asChild variant="outline" size="sm">
-              <Link href="/me/edit">Edit Profile</Link>
-            </Button>
-            {!isMockEnabled && (
-              <form action={logout}>
-                <Button type="submit" variant="ghost" size="sm">
-                  Sign Out
-                </Button>
-              </form>
-            )}
-          </div>
         </div>
       </Card>
     </main>

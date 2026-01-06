@@ -3,6 +3,7 @@
 import { Button } from '@/shadcn/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shadcn/components/ui/card'
 import { Input } from '@/shadcn/components/ui/input'
+import { PasswordInput } from '@/app/components/PasswordInput'
 import { Label } from '@/shadcn/components/ui/label'
 import Link from 'next/link'
 import { useActionState } from 'react'
@@ -15,7 +16,7 @@ export default function SignInPage() {
     <main className="flex flex-1 items-center justify-center p-24">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <CardTitle className="text-2xl">Sign In</CardTitle>
+          <CardTitle className="text-2xl">Sign in</CardTitle>
           <CardDescription>
             Enter your credentials to access your account
           </CardDescription>
@@ -34,10 +35,9 @@ export default function SignInPage() {
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input
+              <PasswordInput
                 id="password"
                 name="password"
-                type="password"
                 placeholder="••••••••"
                 required
               />

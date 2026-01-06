@@ -40,6 +40,8 @@ export async function markAsRead(notificationId: string): Promise<boolean> {
     // Volvemos a usar el estándar /api/...
     const url = withApiBase(`/api/notifications/${notificationId}/read`, '');
     
+    console.log('📝 MARKING AS READ:', notificationId, 'URL:', url);
+    
     const res = await fetch(url, {
       method: 'PATCH',
       headers: {
@@ -47,6 +49,8 @@ export async function markAsRead(notificationId: string): Promise<boolean> {
       },
       cache: 'no-store' // Evitamos caché en la respuesta de la actualización
     });
+
+    console.log('📝 MARK AS READ RESPONSE:', res.status, res.ok);
 
     if (!res.ok) {
       console.error('Error marcando como leída:', res.status);

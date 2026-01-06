@@ -1,9 +1,8 @@
 'use server'
 
 import { fetchApi, fetchWithAuth } from '@/app/lib/api'
-import { createSession, deleteSession, getSessionToken } from '@/app/lib/session'
+import { createSession, deleteSession } from '@/app/lib/session'
 import { redirect } from 'next/navigation'
-import { isMockEnabled, MOCK_USER } from '@/app/lib/mock'
 
 export type AuthState = {
   error?: string
@@ -46,7 +45,7 @@ export async function login(
     return { error: 'Connection error. Please try again.' }
   }
 
-  redirect('/me')
+  redirect('/groups')
 }
 
 /**

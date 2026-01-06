@@ -5,6 +5,8 @@ import { createContext, useContext, ReactNode } from 'react'
 type User = {
   id: string
   email: string
+  name?: string
+  avatar?: string
   plan?: string
 } | null
 

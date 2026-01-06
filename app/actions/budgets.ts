@@ -23,11 +23,12 @@ export async function createBudget(
   const limitAmount = formData.get('limitAmount') as string
   const period = formData.get('period') as string
 
-  if (!limitAmount || !period) {
-    return { error: 'Limit amount and period are required' }
+  if (!limitAmount) {
+    return { error: 'Limit amount is required' }
   }
 
-  const limitAmountNum = parseFloat(limitAmount.replace(',', '.'))
+  // Remove everything except numbers and the decimal comma, then convert to dot
+  const limitAmountNum = parseFloat(limitAmount.replace(/[^\d,]/g, '').replace(',', '.'))
   if (isNaN(limitAmountNum) || limitAmountNum <= 0) {
     return { error: 'Limit amount must be a positive number' }
   }
@@ -72,12 +73,14 @@ export async function updateBudget(
   formData: FormData
 ): Promise<BudgetActionState> {
   const limitAmount = formData.get('limitAmount') as string
+  const groupId = formData.get('groupId') as string
 
   if (!limitAmount) {
     return { error: 'Limit amount is required' }
   }
 
-  const limitAmountNum = parseFloat(limitAmount.replace(',', '.'))
+  // Remove everything except numbers and the decimal comma, then convert to dot
+  const limitAmountNum = parseFloat(limitAmount.replace(/[^\d,]/g, '').replace(',', '.'))
   if (isNaN(limitAmountNum) || limitAmountNum <= 0) {
     return { error: 'Limit amount must be a positive number' }
   }
@@ -96,7 +99,11 @@ export async function updateBudget(
     return { error: 'Connection error. Please try again.' }
   }
 
-  redirect(`/budgets/${id}`)
+  if (groupId) {
+    redirect(`/budgets/view?budgetId=${id}&groupId=${groupId}`)
+  } else {
+    redirect('/budgets')
+  }
 }
 
 /**

@@ -48,44 +48,69 @@ Este proyecto utiliza **Next.js 16** con **App Router** (routing basado en archi
 
 ```
 frontend/
-├── app/                    # App Router (rutas y páginas)
-│   ├── (auth)/            # Route Group - no afecta la URL
-│   │   └── sign-in/       # /sign-in
-│   ├── (marketing)/       # Route Group
-│   │   └── page.tsx       # / (homepage)
-│   ├── budgets/           # /budgets
-│   │   ├── [id]/          # /budgets/:id
-│   │   │   ├── page.tsx   # Detalle del budget
-│   │   │   └── edit/      # /budgets/:id/edit
-│   │   ├── new/           # /budgets/new
-│   │   └── page.tsx       # Lista de budgets
-│   ├── docs/              # /docs
-│   │   └── page.tsx
-│   ├── components/        # Componentes específicos de la app
+├── app/                        # App Router (rutas y páginas)
+│   ├── (auth)/                 # Route Group - páginas de autenticación
+│   │   ├── sign-in/            # /sign-in
+│   │   └── sign-up/            # /sign-up
+│   ├── (marketing)/            # Route Group
+│   │   └── page.tsx            # / (homepage)
+│   ├── (users)/                # Route Group - perfil de usuario
+│   │   └── me/                 # /me
+│   ├── budgets/                # /budgets
+│   │   ├── edit/               # /budgets/edit
+│   │   ├── new/                # /budgets/new
+│   │   └── view/               # /budgets/view
+│   ├── expenses/               # /expenses
+│   │   ├── new/                # /expenses/new
+│   │   └── settle/             # /expenses/settle
+│   ├── groups/                 # /groups
+│   │   ├── [id]/               # /groups/:id
+│   │   │   └── edit/           # /groups/:id/edit
+│   │   └── new/                # /groups/new
+│   ├── plans/                  # /plans
+│   ├── actions/                # Server Actions
+│   │   ├── auth.ts             # login, signup, logout
+│   │   ├── budgets.ts          # operaciones de budgets
+│   │   ├── expenses.ts         # operaciones de expenses
+│   │   └── groups.ts           # operaciones de groups
+│   ├── api/                    # API Routes (proxy al backend)
+│   │   ├── notifications/      # /api/notifications/*
+│   │   └── version/            # /api/version
+│   ├── components/             # Componentes específicos de la app
 │   │   ├── Header.tsx
 │   │   ├── MainNav.tsx
-│   │   ├── LoadingDemo.tsx
-│   │   ├── ScrollAreaDemo.tsx
-│   │   └── SonnerDemo.tsx
-│   ├── demo-components/  # /demo-components
-│   │   └── page.tsx
-│   ├── hooks/            # Custom hooks
-│   ├── __tests__/        # Tests
-│   ├── layout.tsx        # Root layout (envolvente de toda la app)
-│   ├── globals.css       # Estilos globales (incluye View Transitions)
-│   └── not-found.tsx     # Página 404
-├── shadcn/                # Componentes shadcn/ui
-│   └── components/
-│       └── ui/            # Componentes UI reutilizables
-├── lib/                   # Utilidades
-│   └── utils.ts           # Funciones helper (cn, etc.)
-├── public/                # Archivos estáticos
-│   ├── fonts/             # Fuentes locales
-│   └── 0debt-logo.svg
-├── components.json         # Configuración shadcn/ui
-├── next.config.ts         # Configuración Next.js
+│   │   ├── GroupCard.tsx
+│   │   ├── ExpenseForm.tsx
+│   │   └── ...
+│   ├── lib/                    # Lógica de negocio y utilidades
+│   │   ├── api.ts              # Cliente API con auth (fetchWithAuth)
+│   │   ├── config.ts           # Configuración (API_GATEWAY_URL)
+│   │   ├── session.ts          # Manejo de sesión JWT
+│   │   ├── users.ts            # Helpers de usuarios
+│   │   ├── groups.ts           # Helpers de grupos
+│   │   ├── expenses.ts         # Helpers de expenses
+│   │   └── mock-data/          # Datos mock para desarrollo
+│   │       ├── auth.ts         # MOCK_USER, isMockAuthEnabled
+│   │       ├── groups.ts       # MOCK_GROUPS
+│   │       ├── expenses.ts     # MOCK_EXPENSES, MOCK_BALANCE, MOCK_STATS
+│   │       └── budgets.ts      # MOCK_BUDGETS
+│   ├── providers/              # Context Providers
+│   │   └── AuthProvider.tsx    # Estado de auth en cliente
+│   ├── __tests__/              # Tests
+│   ├── layout.tsx              # Root layout
+│   ├── globals.css             # Estilos globales
+│   └── not-found.tsx           # Página 404
+├── shadcn/                     # Componentes shadcn/ui
+│   └── components/ui/          # Button, Card, Input, etc.
+├── lib/                        # Utilidades globales
+│   └── utils.ts                # Funciones helper (cn, etc.)
+├── public/                     # Archivos estáticos
+│   └── fonts/                  # Fuentes locales
+├── components.json             # Configuración shadcn/ui
+├── next.config.ts              # Configuración Next.js
+├── proxy.ts                    # Middleware de protección de rutas
 ├── package.json
-└── tsconfig.json          # Configuración TypeScript
+└── tsconfig.json               # Configuración TypeScript
 ```
 
 ## 🔐 Autenticación
@@ -111,7 +136,8 @@ El sistema de autenticación usa **JWT** con cookies HttpOnly siguiendo las mejo
 |---------|-------------|
 | `app/lib/session.ts` | Manejo de sesión (crear, obtener, eliminar cookie) |
 | `app/lib/api.ts` | Cliente API con autenticación automática |
-| `app/lib/mock.ts` | Configuración centralizada del modo mock |
+| `app/lib/config.ts` | Configuración centralizada (API_GATEWAY_URL) |
+| `app/lib/mock-data/` | Datos mock para desarrollo local |
 | `app/actions/auth.ts` | Server Actions: `login`, `signup`, `logout` |
 | `proxy.ts` | Middleware para proteger rutas |
 | `app/providers/AuthProvider.tsx` | Contexto React para estado de auth en cliente |
@@ -190,10 +216,13 @@ export function UserInfo() {
 Variables de entorno en `.env`:
 ```bash
 # URL del API Gateway (backend)
-API_GATEWAY_URL=url
+API_GATEWAY_URL=http://api-gateway:8000
 
-# Modo mock para desarrollo local (sin backend)
+# Modos mock para desarrollo local (sin backend)
 MOCK_AUTH=true
+MOCK_GROUPS=true
+MOCK_EXPENSES=true
+MOCK_BUDGETS=true
 ```
 
 ### Sesión y expiración
@@ -204,44 +233,44 @@ MOCK_AUTH=true
 
 ### Modo Mock (desarrollo local)
 
-Para desarrollar sin necesidad del backend, activa el modo mock:
+El proyecto soporta **4 modos mock independientes** para desarrollo local sin necesidad de backend:
 
-1. En tu `.env`, añade:
+| Variable | Propósito |
+|----------|-----------|
+| `MOCK_AUTH=true` | Simula usuario autenticado |
+| `MOCK_GROUPS=true` | Simula datos de grupos |
+| `MOCK_EXPENSES=true` | Simula expenses, balances y estadísticas |
+| `MOCK_BUDGETS=true` | Simula datos de budgets |
+
+Todos los modos pueden habilitarse simultáneamente o de forma independiente.
+
+**Archivos mock:**
+```
+app/lib/mock-data/
+├── auth.ts      # MOCK_USER, isMockAuthEnabled
+├── groups.ts    # MOCK_GROUPS, isMockGroupsEnabled
+├── expenses.ts  # MOCK_EXPENSES, MOCK_BALANCE, MOCK_STATS
+└── budgets.ts   # MOCK_BUDGETS, isMockBudgetsEnabled
+```
+
+Para documentación detallada, ver **[MOCK.md](./MOCK.md)**.
+
+**Ejemplos de configuración:**
+
 ```bash
+# .env - desarrollo sin backend (full mock)
 MOCK_AUTH=true
+MOCK_GROUPS=true
+MOCK_EXPENSES=true
+MOCK_BUDGETS=true
+
+# .env - desarrollo con users-service real
+MOCK_AUTH=false
+MOCK_GROUPS=true
+MOCK_EXPENSES=true
+MOCK_BUDGETS=true
+API_GATEWAY_URL=https://api-gateway.0debt.xyz
 ```
-
-2. Reinicia el servidor (`bun dev`)
-
-3. Navega a `/me` o `/me/edit`
-
-La configuración del mock está centralizada en `app/lib/mock.ts`:
-
-```typescript
-import { isMockEnabled, MOCK_USER } from "@/app/lib/mock"
-
-// Usar en páginas:
-if (isMockEnabled) {
-  user = MOCK_USER
-} else {
-  // fetch real del backend
-}
-```
-
-El usuario mock:
-```typescript
-{
-  _id: "mock-id",
-  name: "dev-user",
-  email: "dev@local.test",
-  avatar: "https://api.dicebear.com/7.x/thumbs/svg?seed=dev-user",
-  plan: "FREE",
-}
-```
-
-**Nota:** En modo mock, el proxy no bloquea rutas protegidas y las páginas cargan el usuario mock en lugar de consultar el backend.
-
-Para usar autenticación real, cambia `MOCK_AUTH=false` o elimina la variable.
 
 ## 🗺️ Routing
 

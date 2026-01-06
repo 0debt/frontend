@@ -45,36 +45,56 @@ export default function EditProfileForm({ user }: { user: User }) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="p-6 space-y-6 text-sm">
+    <form onSubmit={handleSubmit} className="p-4 space-y-4 text-sm">
+      <div className="space-y-2">
+        <Label>Email</Label>
+        <Input
+          type="email"
+          className="h-9 bg-muted"
+          value={user.email}
+          disabled
+        />
+        <p className="text-[10px] text-muted-foreground">Email cannot be changed</p>
+      </div>
+
+      <div className="space-y-2">
+        <Label>Name</Label>
+        <Input
+          className="h-9"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+      </div>
+
       <div className="space-y-2">
         <Label>Avatar</Label>
         {canChangeAvatar ? (
           <Input
             type="file"
             accept="image/*"
-            className="h-11"
+            className="h-9 text-xs"
             onChange={(e) => {
               fileRef.current = e.target.files?.[0] || null
             }}
           />
 
         ) : (
-          <div className="rounded-md border border-dashed border-muted-foreground/40 bg-muted/40 p-4">
+          <div className="rounded-md border border-dashed border-muted-foreground/40 bg-muted/40 p-3">
             <div className="flex items-start gap-3">
-              <div className="space-y-1">
+              <div className="space-y-0.5">
                 <p className="text-sm font-medium">
-                  Avatar no disponible en tu plan
+                  Avatar not available in your plan
                 </p>
 
                 <p className="text-xs text-muted-foreground">
-                  La subida de avatar está disponible solo para planes PRO o ENTERPRISE.
+                  Avatar upload is only available for PRO or ENTERPRISE plans.
                 </p>
 
                 <a
                   href="/plans"
                   className="inline-block text-xs font-medium text-primary underline underline-offset-4"
                 >
-                  Ver planes disponibles →
+                  View available plans →
                 </a>
               </div>
             </div>
@@ -83,32 +103,13 @@ export default function EditProfileForm({ user }: { user: User }) {
         )}
       </div>
 
+      {error && <p className="text-sm text-red-500 text-center">{error}</p>}
 
-      <div className="space-y-2">
-        <Label>Name</Label>
-        <Input
-          className="h-11"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
+      <div className="pt-2 flex justify-center">
+        <Button type="submit" size="sm" disabled={loading}>
+            {loading ? "Saving..." : "Save changes"}
+        </Button>
       </div>
-
-      <div className="space-y-2">
-        <Label>Email</Label>
-        <Input
-          type="email"
-          className="h-11 bg-muted"
-          value={user.email}
-          disabled
-        />
-        <p className="text-xs text-muted-foreground">Email cannot be changed</p>
-      </div>
-
-      {error && <p className="text-sm text-red-500">{error}</p>}
-
-      <Button type="submit" className="w-full h-11 text-base" disabled={loading}>
-        {loading ? "Saving..." : "Save Changes"}
-      </Button>
     </form>
   )
 }
