@@ -48,6 +48,9 @@ function calculateGroupStats(expenses: Expense[]): GroupStats {
   }
 
   expenses.forEach(expense => {
+    if (expense.isSettlement) {
+      return
+    }
     stats.totalSpent += expense.totalAmount
     stats.count += 1
     const category = expense.category || 'OTHER'

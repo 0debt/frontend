@@ -29,6 +29,7 @@ export type Expense = {
   shares: ExpenseShare[]
   createdAt: string
   updatedAt?: string
+  isSettlement?: boolean
 }
 
 export type BalanceMap = {
@@ -99,6 +100,10 @@ export function getUserName(userId: string, users: UserInfo[]): string {
 export function getUserAvatar(userId: string, users: UserInfo[]): string {
   const user = users.find(u => u._id === userId)
   return user?.avatar || getDefaultAvatar(userId)
+}
+
+export function isSettlementExpense(expense: Expense): boolean {
+  return expense.isSettlement === true
 }
 
 // Re-export helpers

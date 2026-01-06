@@ -2,8 +2,8 @@
 
 import { fetchWithAuth } from '@/app/lib/api'
 import { isMockExpensesEnabled } from '@/app/lib/mock-data/expenses'
-import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
+import { redirect } from 'next/navigation'
 
 export type ExpenseActionState = {
   error?: string
@@ -222,4 +222,44 @@ export async function deleteExpense(
 
   revalidatePath(`/expenses`)
   redirect(`/expenses?group=${groupId}`)
+}
+
+/**
+ * Server Action to create a settlement (mark debt as paid)
+ */
+export async function createSettlement(
+  groupId: string,
+  fromUserId: string,
+  toUserId: string,
+  amount: number
+): Promise<ExpenseActionState> {
+  if (isMockExpensesEnabled) {
+    revalidatePath(`/expenses/settle`)
+    return { success: true }
+  }
+
+  try {
+    const body = {
+      groupId,
+      fromUserId,
+      toUserId,
+      amount
+    }
+
+    const res = await fetchWithAuth('/settlements', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    })
+
+    if (!res.ok) {
+      const data = await res.json()
+      return { error: data.message || 'Failed to record settlement' }
+    }
+    
+    revalidatePath(`/expenses/settle`)
+    revalidatePath(`/expenses`)
+    return { success: true }
+  } catch {
+    return { error: 'Connection error. Please try again.' }
+  }
 }

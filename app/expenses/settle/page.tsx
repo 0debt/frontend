@@ -1,3 +1,4 @@
+import { SettlementButton } from '@/app/components/SettlementButton'
 import { fetchWithAuth } from '@/app/lib/api'
 import {
   BalanceResponse,
@@ -319,6 +320,18 @@ export default async function SettleUpPage({ searchParams }: Props) {
                       <AvatarImage src={getUserAvatar(payment.to, members)} alt={getUserName(payment.to, members)} />
                       <AvatarFallback>{getUserName(payment.to, members)[0]?.toUpperCase()}</AvatarFallback>
                     </Avatar>
+                  </div>
+
+                  {/* Mark as Paid Button */}
+                  <div className="p-4 flex items-center justify-center border-t sm:border-t-0 sm:border-l border-border/40">
+                    <SettlementButton
+                      groupId={groupId}
+                      fromUserId={payment.from}
+                      toUserId={payment.to}
+                      amount={payment.amount}
+                      fromUserName={getUserName(payment.from, members)}
+                      toUserName={getUserName(payment.to, members)}
+                    />
                   </div>
                 </div>
               </CardContent>
