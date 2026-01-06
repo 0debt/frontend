@@ -1,5 +1,5 @@
 import { fetchWithAuth } from "@/app/lib/api"
-import { isMockEnabled } from "@/app/lib/mock"
+import { isMockAuthEnabled as isMockEnabled } from "@/app/lib/mock-data/auth"
 import { NextRequest } from "next/server"
 
 export async function GET(
@@ -8,7 +8,7 @@ export async function GET(
 ) {
   const { userId } = await context.params
 
-  // ✅ In mock: non chiamiamo il gateway, ritorniamo "nessuna notifica"
+  // ✅ In mock: we don't call the gateway, we return "no notification"
   if (isMockEnabled) {
     return new Response(JSON.stringify([]), {
       status: 200,

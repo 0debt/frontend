@@ -1,5 +1,6 @@
 import { API_GATEWAY_URL, withApiBase } from '@/app/lib/config'
-import { getSessionToken } from '@/app/lib/session'
+import { deleteSession, getSessionToken } from '@/app/lib/session'
+import { redirect } from 'next/navigation'
 import 'server-only'
 
 type FetchOptions = Omit<RequestInit, 'headers'> & {
@@ -74,6 +75,12 @@ export async function fetchWithAuth(
     const duration = Date.now() - startTime
     const errorMsg = await extractError(response)
     logRequest(method, endpoint, response.status, duration, errorMsg)
+    
+    // Auto-logout on token expiration
+    if (response.status === 401) {
+      await deleteSession()
+      redirect('/sign-in')
+    }
     
     return response
   } catch (error) {
