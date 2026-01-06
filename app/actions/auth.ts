@@ -45,7 +45,7 @@ export async function login(
     return { error: 'Connection error. Please try again.' }
   }
 
-  redirect('/me')
+  redirect('/groups')
 }
 
 /**
