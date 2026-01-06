@@ -165,7 +165,12 @@ export function NotificationPreferencesModal({
             </div>
           )}
 
-          <div className="mt-12 flex justify-center">
+          <div className="mt-12 flex flex-col items-center gap-4">
+            {mode === 'onboarding' && (
+                <p className="text-center text-xs text-muted-foreground font-medium">
+                You can manage these settings later in your profile.
+                </p>
+            )}
             <Button 
               onClick={handleSave}
               disabled={saving || loading}
@@ -177,11 +182,6 @@ export function NotificationPreferencesModal({
                 "Save preferences"
               )}
             </Button>
-            {mode === 'onboarding' && (
-                <p className="text-center text-xs text-muted-foreground mt-6 font-medium">
-                You can manage these settings in your profile.
-                </p>
-            )}
           </div>
         </div>
       </div>
