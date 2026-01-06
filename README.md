@@ -85,8 +85,6 @@ All backend interactions are secured and routed through Server Actions, acting a
 | Variable | Description |
 |----------|-------------|
 | `API_GATEWAY_URL` | Gateway URL (e.g., `http://api-gateway:8000`) |
-| `NEXT_PUBLIC_MOCK_AUTH` | Enable Mock Auth (`true`/`false`) |
-| `NEXT_PUBLIC_MOCK_GROUPS` | Enable Mock Groups Data (`true`/`false`) |
 
 See `.env.example` for the full list of flags.
 
