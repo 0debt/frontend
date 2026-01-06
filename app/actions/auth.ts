@@ -1,7 +1,7 @@
 'use server'
 
 import { fetchApi, fetchWithAuth } from '@/app/lib/api'
-import { createSession, deleteSession } from '@/app/lib/session'
+import { createSession, deleteSession, getSessionToken } from '@/app/lib/session'
 import { redirect } from 'next/navigation'
 
 export type AuthState = {
