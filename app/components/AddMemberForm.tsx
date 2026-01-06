@@ -11,8 +11,13 @@ type AddMemberFormProps = {
 }
 
 export function AddMemberForm({ groupId }: AddMemberFormProps) {
-  const addMemberWithId = (prevState: ActionState, formData: FormData) => 
-    addMember(groupId, prevState, formData)
+  const addMemberWithId = (prevState: ActionState, formData: FormData) => {
+    const email = formData.get('email') as string
+    if (email) {
+      formData.set('email', email.trim().toLowerCase())
+    }
+    return addMember(groupId, prevState, formData)
+  }
 
   const [state, formAction, isPending] = useActionState(addMemberWithId, null)
 
