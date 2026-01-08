@@ -2,14 +2,19 @@
 
 import { Button } from '@/shadcn/components/ui/button'
 import { AlertCircle } from 'lucide-react'
+import { useEffect } from 'react'
 
 export default function Error({
-  _error,
+  error,
   reset,
 }: {
-  _error: Error & { digest?: string }
+  error: Error & { digest?: string }
   reset: () => void
 }) {
+  useEffect(() => {
+    console.error(error)
+  }, [error])
+
   return (
     <div className="container mx-auto max-w-2xl px-4 py-24 flex flex-col items-center justify-center text-center">
       <div className="bg-destructive/10 p-4 rounded-full mb-6">

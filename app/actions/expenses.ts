@@ -90,8 +90,9 @@ export async function createExpense(
   let shares
   try {
     shares = calculateShares(splitType, totalAmountNum, participants, formData)
-  } catch (e: any) {
-    return { error: e.message }
+  } catch (e: unknown) {
+    const errorMessage = e instanceof Error ? e.message : 'Calculation error'
+    return { error: errorMessage }
   }
 
   try {
@@ -165,8 +166,9 @@ export async function updateExpense(
   let shares
   try {
     shares = calculateShares(splitType, totalAmountNum, participants, formData)
-  } catch (e: any) {
-    return { error: e.message }
+  } catch (e: unknown) {
+    const errorMessage = e instanceof Error ? e.message : 'Calculation error'
+    return { error: errorMessage }
   }
 
   try {

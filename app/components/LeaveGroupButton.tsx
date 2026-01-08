@@ -41,7 +41,7 @@ export function LeaveGroupButton({ groupId, groupName, userEmail }: LeaveGroupBu
       toast.success(`You have left "${groupName}"`)
       router.push('/groups')
       router.refresh()
-    } catch (error) {
+    } catch {
       toast.error('Failed to leave group')
       setIsLeaving(false)
       setOpen(false)

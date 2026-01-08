@@ -54,7 +54,7 @@ export default async function RootLayout({
             avatar: getDefaultAvatar(session.sub)
           };
         }
-      } catch (error) {
+      } catch {
         // Fallback to session data if fetch crashes
         user = { 
           id: session.sub, 

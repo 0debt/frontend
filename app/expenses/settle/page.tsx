@@ -167,18 +167,15 @@ export default async function SettleUpPage({ searchParams }: Props) {
         </Card>
       ) : (
         <Card className="border-amber-500/20 bg-amber-500/5 shadow-none overflow-hidden relative">
-          <div className="absolute top-0 right-0 p-4 opacity-10">
-            <AlertCircle className="h-24 w-24" />
-          </div>
-          <CardContent className="flex items-center gap-6 py-8 relative">
-            <div className="bg-amber-500/10 p-3 rounded-full">
-              <AlertCircle className="h-8 w-8 text-amber-600" />
+          <CardContent className="flex items-center gap-4 py-4 relative">
+            <div className="bg-amber-500/10 p-2 rounded-full">
+              <AlertCircle className="h-5 w-5 text-amber-600" />
             </div>
             <div>
-              <p className="text-xl font-bold text-amber-700">
+              <p className="font-bold text-amber-700">
                 {payments.length} payment{payments.length !== 1 ? 's' : ''} pending
               </p>
-              <p className="text-amber-600/80">
+              <p className="text-sm text-amber-600/80">
                 Debts have been simplified to the minimum number of transactions.
               </p>
             </div>
@@ -196,7 +193,7 @@ export default async function SettleUpPage({ searchParams }: Props) {
                 <div className="bg-green-100 dark:bg-green-900/30 p-1.5 rounded-lg">
                   <ArrowRight className="h-4 w-4 text-green-600 -rotate-45" />
                 </div>
-                Gets Back
+                Gets back
               </CardTitle>
               <Badge variant="outline" className="font-normal border-green-200 text-green-600 bg-green-50 dark:bg-green-900/10">
                 Creditors

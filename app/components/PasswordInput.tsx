@@ -6,8 +6,7 @@ import { Input } from "@/shadcn/components/ui/input"
 import { Button } from "@/shadcn/components/ui/button"
 import { cn } from "@/lib/utils"
 
-export interface PasswordInputProps
-  extends React.ComponentProps<typeof Input> {}
+export type PasswordInputProps = React.ComponentProps<typeof Input>
 
 const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
   ({ className, ...props }, ref) => {

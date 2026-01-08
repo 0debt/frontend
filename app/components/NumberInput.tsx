@@ -1,7 +1,7 @@
 'use client'
 
 import { ChevronDown, ChevronUp } from 'lucide-react'
-import { forwardRef, useCallback, useEffect, useRef, useState } from 'react'
+import { forwardRef, useCallback, useRef, useState } from 'react'
 import { NumericFormat, type NumericFormatProps } from 'react-number-format'
 import { Button } from '@/shadcn/components/ui/button'
 import { Input } from '@/shadcn/components/ui/input'
@@ -36,61 +36,72 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
   ) => {
     const internalRef = useRef<HTMLInputElement>(null)
     const combinedRef = (ref as React.RefObject<HTMLInputElement>) || internalRef
-    const [value, setValue] = useState<number | undefined>(
-      controlledValue ?? defaultValue
-    )
+    
+    // Internal state for uncontrolled mode
+    const [internalValue, setInternalValue] = useState<number | undefined>(defaultValue)
 
-    const handleIncrement = useCallback(() => {
-      setValue((prev) =>
-        prev === undefined ? stepper ?? 1 : Math.min(prev + (stepper ?? 1), max)
-      )
-    }, [stepper, max])
+    const isControlled = controlledValue !== undefined
+    const value = isControlled ? controlledValue : internalValue
 
-    const handleDecrement = useCallback(() => {
-      setValue((prev) =>
-        prev === undefined
-          ? -(stepper ?? 1)
-          : Math.max(prev - (stepper ?? 1), min)
-      )
-    }, [stepper, min])
-
-    useEffect(() => {
-      const handleKeyDown = (e: KeyboardEvent) => {
-        if (document.activeElement === combinedRef.current) {
-          if (e.key === 'ArrowUp') handleIncrement()
-          if (e.key === 'ArrowDown') handleDecrement()
-        }
-      }
-      window.addEventListener('keydown', handleKeyDown)
-      return () => window.removeEventListener('keydown', handleKeyDown)
-    }, [handleIncrement, handleDecrement, combinedRef])
-
-    useEffect(() => {
-      if (controlledValue !== undefined) {
-        setValue(controlledValue)
-      }
-    }, [controlledValue])
-
-    const handleChange = (values: {
+    const handleChange = useCallback((values: {
       value: string
       floatValue: number | undefined
     }) => {
-      const newValue =
-        values.floatValue === undefined ? undefined : values.floatValue
-      setValue(newValue)
+      const newValue = values.floatValue === undefined ? undefined : values.floatValue
+      
+      if (!isControlled) {
+        setInternalValue(newValue)
+      }
+      
       onValueChange?.(newValue)
+    }, [isControlled, onValueChange])
+
+    const handleIncrement = useCallback(() => {
+      const currentValue = value ?? 0
+      const nextValue = Math.min(currentValue + (stepper ?? 1), max)
+      
+      if (!isControlled) {
+        setInternalValue(nextValue)
+      }
+      onValueChange?.(nextValue)
+    }, [value, stepper, max, isControlled, onValueChange])
+
+    const handleDecrement = useCallback(() => {
+      const currentValue = value ?? 0
+      const nextValue = Math.max(currentValue - (stepper ?? 1), min)
+
+      if (!isControlled) {
+        setInternalValue(nextValue)
+      }
+      onValueChange?.(nextValue)
+    }, [value, stepper, min, isControlled, onValueChange])
+
+    // We can use the 'onKeyDown' prop of Input instead of global listener!
+    // Much simpler and avoids useEffect.
+    
+    const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'ArrowUp') {
+        e.preventDefault()
+        handleIncrement()
+      }
+      if (e.key === 'ArrowDown') {
+        e.preventDefault()
+        handleDecrement()
+      }
+      props.onKeyDown?.(e)
     }
 
-    const handleBlur = () => {
+    const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
       if (value !== undefined) {
         if (value < min) {
-          setValue(min)
-          if (combinedRef.current) combinedRef.current.value = String(min)
+          if (!isControlled) setInternalValue(min)
+          onValueChange?.(min)
         } else if (value > max) {
-          setValue(max)
-          if (combinedRef.current) combinedRef.current.value = String(max)
+          if (!isControlled) setInternalValue(max)
+          onValueChange?.(max)
         }
       }
+      props.onBlur?.(e)
     }
 
     return (
@@ -109,6 +120,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
           placeholder={placeholder}
           className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none rounded-r-none relative"
           getInputRef={combinedRef}
+          onKeyDown={handleInputKeyDown}
           {...props}
         />
         <div className="flex flex-col">
@@ -119,6 +131,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
             onClick={handleIncrement}
             disabled={value === max}
             type="button"
+            tabIndex={-1}
           >
             <ChevronUp size={15} />
           </Button>
@@ -129,6 +142,7 @@ export const NumberInput = forwardRef<HTMLInputElement, NumberInputProps>(
             onClick={handleDecrement}
             disabled={value === min}
             type="button"
+            tabIndex={-1}
           >
             <ChevronDown size={15} />
           </Button>

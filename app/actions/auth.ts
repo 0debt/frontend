@@ -165,3 +165,37 @@ export async function updateProfile(formData: FormData): Promise<AuthState> {
   }
 }
 
+/**
+ * Server Action to delete user account
+ * @param id - User ID
+ * @returns Error state or redirects to /sign-in on success
+ */
+export async function deleteAccount(id: string): Promise<AuthState> {
+  if (!id) {
+    return { error: 'Invalid user ID' }
+  }
+
+  try {
+    const res = await fetchWithAuth(`/users/${id}`, {
+      method: 'DELETE',
+    })
+
+    if (!res.ok) {
+      const data = await res.json()
+      return { error: data.error || 'Failed to delete account' }
+    }
+
+    await deleteSession()
+  } catch (error) {
+    // If redirect happens inside try block, it throws a special error that Next.js handles.
+    // We should rethrow it if we want Next.js to handle the redirect, 
+    // but here we are calling redirect() outside the catch for clarity or using standard pattern.
+    if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
+      throw error
+    }
+    return { error: 'Connection error. Please try again.' }
+  }
+
+  redirect('/sign-in')
+}
+

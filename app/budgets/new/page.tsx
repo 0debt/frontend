@@ -3,6 +3,7 @@ import { fetchWithAuth } from '@/app/lib/api'
 import { getGroups } from '@/app/lib/groups'
 import { isMockAuthEnabled } from '@/app/lib/mock-data/auth'
 import { MOCK_USER } from '@/app/lib/mock-data/auth'
+import { Budget } from '@/app/lib/mock-data/budgets'
 import { getSession } from '@/app/lib/session'
 import { Button } from '@/shadcn/components/ui/button'
 import { Link } from 'next-view-transitions'
@@ -53,7 +54,7 @@ export default async function NewBudgetPage({ searchParams }: Props) {
 
       <div className="flex justify-center">
         <div className="w-full max-w-2xl">
-          <BudgetForm mode="create" groups={groups} budget={groupId ? { groupId } as any : undefined} />
+          <BudgetForm mode="create" groups={groups} budget={groupId ? { groupId } as Partial<Budget> : undefined} />
         </div>
       </div>
     </div>

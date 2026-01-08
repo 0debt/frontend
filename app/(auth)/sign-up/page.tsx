@@ -2,6 +2,7 @@
 
 import { Button } from "@/shadcn/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/shadcn/components/ui/card"
+import { Checkbox } from "@/shadcn/components/ui/checkbox"
 import { Input } from "@/shadcn/components/ui/input"
 import { PasswordInput } from "@/app/components/PasswordInput"
 import { Label } from "@/shadcn/components/ui/label"
@@ -9,10 +10,12 @@ import Link from "next/link"
 import { useActionState, useEffect, useState } from "react"
 import { signup } from "@/app/actions/auth"
 import { NotificationPreferencesModal } from "@/app/components/NotificationPreferencesModal"
+import { TermsDialog } from "@/app/components/TermsDialog"
 
 export default function SignUpPage() {
   const [state, action, pending] = useActionState(signup, null)
   const [showPreferences, setShowPreferences] = useState(false)
+  const [acceptedTerms, setAcceptedTerms] = useState(false)
 
   useEffect(() => {
     if (state?.success && state?.userId && state?.email) {
@@ -79,11 +82,28 @@ export default function SignUpPage() {
               />
             </div>
 
+            <div className="flex items-start space-x-2">
+              <Checkbox
+                id="terms"
+                checked={acceptedTerms}
+                onCheckedChange={(checked) => setAcceptedTerms(checked === true)}
+                className="mt-0.5"
+              />
+              <Label htmlFor="terms" className="text-sm font-normal leading-relaxed">
+                I accept the{' '}
+                <TermsDialog>
+                  <button type="button" className="text-primary hover:underline">
+                    Terms & Conditions
+                  </button>
+                </TermsDialog>
+              </Label>
+            </div>
+
             {state?.error && (
               <p className="text-sm text-red-500">{state.error}</p>
             )}
 
-            <Button type="submit" className="w-full h-11 text-base" disabled={pending}>
+            <Button type="submit" className="w-full h-11 text-base" disabled={pending || !acceptedTerms}>
               {pending ? 'Creating account...' : 'Create account'}
             </Button>
 

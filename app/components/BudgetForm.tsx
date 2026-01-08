@@ -6,7 +6,6 @@ import { Budget } from '@/app/lib/mock-data/budgets'
 import { Group } from '@/app/lib/mock-data/groups'
 import { Button } from '@/shadcn/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shadcn/components/ui/card'
-import { Input } from '@/shadcn/components/ui/input'
 import { Label } from '@/shadcn/components/ui/label'
 import {
   Select,
@@ -23,6 +22,14 @@ type BudgetFormProps = {
   groups?: Group[]
 }
 
+const CATEGORIES = [
+  { value: 'FOOD', label: 'Food & Dining' },
+  { value: 'TRANSPORT', label: 'Transportation' },
+  { value: 'ACCOMMODATION', label: 'Accommodation' },
+  { value: 'ENTERTAINMENT', label: 'Entertainment' },
+  { value: 'OTHER', label: 'Other' },
+]
+
 export function BudgetForm({ budget, mode, groups = [] }: BudgetFormProps) {
   const action = mode === 'create' ? createBudget : (prevState: BudgetActionState, formData: FormData) =>
     updateBudget(budget!._id, prevState, formData)
@@ -30,6 +37,7 @@ export function BudgetForm({ budget, mode, groups = [] }: BudgetFormProps) {
   const [state, formAction, isPending] = useActionState(action, null)
   const [period, setPeriod] = useState(budget?.period || 'monthly')
   const [selectedGroup, setSelectedGroup] = useState(budget?.groupId || groups[0]?._id || '')
+  const [category, setCategory] = useState(budget?.category || 'ALL')
 
   return (
     <Card>
@@ -47,13 +55,23 @@ export function BudgetForm({ budget, mode, groups = [] }: BudgetFormProps) {
           {mode === 'create' && (
             <div className="space-y-2">
               <Label htmlFor="category">Category (optional)</Label>
-              <Input
-                id="category"
-                name="category"
-                type="text"
-                placeholder="e.g., Food, Transport"
-                defaultValue={budget?.category}
-              />
+              <input type="hidden" name="category" value={category === 'ALL' ? '' : category} />
+              <Select value={category} onValueChange={setCategory}>
+                <SelectTrigger id="category" className="w-full">
+                  <SelectValue placeholder="Select a category (Optional)" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="ALL">All categories (General budget)</SelectItem>
+                  {CATEGORIES.map((cat) => (
+                    <SelectItem key={cat.value} value={cat.value}>
+                      {cat.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Leave empty or select "All categories" for a general group budget.
+              </p>
             </div>
           )}
 
