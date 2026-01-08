@@ -86,7 +86,7 @@ export default async function PlansPage() {
               </li>
               <li className="flex items-start gap-2">
                 <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
-                <span className="text-sm"><strong>50 expenses</strong> per group</span>
+                <span className="text-sm"><strong>25 expenses</strong> per group</span>
               </li>
               <li className="flex items-start gap-2">
                 <Check className="h-5 w-5 text-primary shrink-0 mt-0.5" />
