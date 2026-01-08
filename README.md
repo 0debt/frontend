@@ -13,6 +13,9 @@
 
 ---
 
+## 🚀 Quick Start
+
+```bash
 # Install dependencies
 bun install
 
