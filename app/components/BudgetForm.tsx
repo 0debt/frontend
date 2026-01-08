@@ -17,7 +17,7 @@ import {
 import { useActionState, useState } from 'react'
 
 type BudgetFormProps = {
-  budget?: Budget
+  budget?: Partial<Budget>
   mode: 'create' | 'edit'
   groups?: Group[]
 }
@@ -32,7 +32,7 @@ const CATEGORIES = [
 
 export function BudgetForm({ budget, mode, groups = [] }: BudgetFormProps) {
   const action = mode === 'create' ? createBudget : (prevState: BudgetActionState, formData: FormData) =>
-    updateBudget(budget!._id, prevState, formData)
+    updateBudget(budget?._id || '', prevState, formData)
 
   const [state, formAction, isPending] = useActionState(action, null)
   const [period, setPeriod] = useState(budget?.period || 'monthly')
