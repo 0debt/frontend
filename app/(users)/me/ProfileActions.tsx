@@ -42,7 +42,7 @@ export function ProfileActions({ userId, email, isMock }: ProfileActionsProps) {
 
   return (
     <>
-      <div className="pt-8 flex gap-2 flex-wrap justify-center">
+      <div className="pt-4 flex gap-2 flex-wrap justify-center">
         <Button asChild variant="outline" size="sm" disabled={isPending}>
           <Link href="/me/edit">
             <UserPen className="w-4 h-4 mr-2" />
@@ -77,7 +77,7 @@ export function ProfileActions({ userId, email, isMock }: ProfileActionsProps) {
       </div>
 
       {!isMock && (
-        <div className="mt-6 pt-6 border-t flex justify-center w-full">
+        <div className="mt-4 pt-4 border-t flex justify-center w-full">
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button variant="ghost" size="sm" disabled={isPending} className="text-muted-foreground hover:text-destructive hover:bg-destructive/10">

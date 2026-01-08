@@ -58,7 +58,7 @@ export default async function ProfilePage() {
           <CardDescription>Your personal information on 0debt</CardDescription>
         </CardHeader>
 
-        <div className="px-6 pb-6 pt-2 text-sm">
+        <div className="px-6 text-sm">
           <div className="flex justify-between items-start gap-6">
             <div className="space-y-4 flex-1">
               <div className="flex justify-between">
