@@ -26,7 +26,6 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/shadcn/components/ui/avat
 import { Badge } from '@/shadcn/components/ui/badge'
 import { Button } from '@/shadcn/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shadcn/components/ui/card'
-import { ScrollArea } from '@/shadcn/components/ui/scroll-area'
 import { Handshake, Pencil, Trash2 } from 'lucide-react'
 import { Link } from 'next-view-transitions'
 import { useState, useTransition } from 'react'
@@ -40,7 +39,7 @@ type ExpenseListProps = {
 export function ExpenseList({ expenses, members, groupId }: ExpenseListProps) {
   // Agrupar gastos por fecha
   const groupedExpenses = expenses.reduce((acc, expense) => {
-    const dateKey = new Date(expense.date).toLocaleDateString('es-ES', {
+    const dateKey = new Date(expense.date).toLocaleDateString('en-US', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
@@ -59,27 +58,25 @@ export function ExpenseList({ expenses, members, groupId }: ExpenseListProps) {
         <CardTitle>Recent expenses</CardTitle>
       </CardHeader>
       <CardContent>
-        <ScrollArea className="max-h-[600px] pr-4">
-          <div className="space-y-6">
-            {Object.entries(groupedExpenses).map(([date, dayExpenses]) => (
-              <div key={date}>
-                <h3 className="text-sm font-medium text-muted-foreground mb-3 capitalize">
-                  {date}
-                </h3>
-                <div className="space-y-3">
-                  {dayExpenses.map((expense) => (
-                    <ExpenseItem 
-                      key={expense._id} 
-                      expense={expense} 
-                      members={members}
-                      groupId={groupId}
-                    />
-                  ))}
-                </div>
+        <div className="space-y-6">
+          {Object.entries(groupedExpenses).map(([date, dayExpenses]) => (
+            <div key={date}>
+              <h3 className="text-sm font-medium text-muted-foreground mb-3 capitalize">
+                {date}
+              </h3>
+              <div className="space-y-3">
+                {dayExpenses.map((expense) => (
+                  <ExpenseItem 
+                    key={expense._id} 
+                    expense={expense} 
+                    members={members}
+                    groupId={groupId}
+                  />
+                ))}
               </div>
-            ))}
-          </div>
-        </ScrollArea>
+            </div>
+          ))}
+        </div>
       </CardContent>
     </Card>
   )

@@ -61,49 +61,51 @@ export function ProfileActions({ userId, email, isMock }: ProfileActionsProps) {
         </Button>
 
         {!isMock && (
-          <>
-            <form action={logout}>
-              <Button 
-                variant="outline" 
-                size="sm" 
-                type="submit" 
-                disabled={isPending}
-                className="text-destructive border-destructive/50 hover:bg-destructive/10 hover:text-destructive"
-              >
-                <LogOut className="w-4 h-4 mr-2" />
-                Sign out
-              </Button>
-            </form>
-
-            <AlertDialog>
-              <AlertDialogTrigger asChild>
-                <Button variant="destructive" size="sm" disabled={isPending}>
-                  <Trash2 className="w-4 h-4 mr-2" />
-                  {isPending ? "Deleting..." : "Delete account"}
-                </Button>
-              </AlertDialogTrigger>
-              <AlertDialogContent>
-                <AlertDialogHeader>
-                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-                  <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete your
-                    account and remove your data from our servers.
-                  </AlertDialogDescription>
-                </AlertDialogHeader>
-                <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction
-                    onClick={handleDeleteAccount}
-                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                  >
-                    Delete account
-                  </AlertDialogAction>
-                </AlertDialogFooter>
-              </AlertDialogContent>
-            </AlertDialog>
-          </>
+          <form action={logout}>
+            <Button 
+              variant="outline" 
+              size="sm" 
+              type="submit" 
+              disabled={isPending}
+              className="text-destructive border-destructive/50 hover:bg-destructive/10 hover:text-destructive"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Sign out
+            </Button>
+          </form>
         )}
       </div>
+
+      {!isMock && (
+        <div className="mt-6 pt-6 border-t flex justify-center w-full">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="ghost" size="sm" disabled={isPending} className="text-muted-foreground hover:text-destructive hover:bg-destructive/10">
+                <Trash2 className="w-4 h-4 mr-2" />
+                {isPending ? "Deleting..." : "Delete account"}
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete your
+                  account and remove your data from our servers.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleDeleteAccount}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  Delete account
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
+      )}
 
       <NotificationPreferencesModal
         userId={userId}
