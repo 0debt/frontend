@@ -1,6 +1,5 @@
 import { fetchWithAuth } from '@/app/lib/api'
 import { isMockBudgetsEnabled as isMockEnabled, MOCK_BUDGETS, MOCK_BUDGET_STATUSES, Budget, BudgetStatus } from '@/app/lib/mock-data/budgets'
-import { isMockAuthEnabled, MOCK_USER } from '@/app/lib/mock-data/auth'
 import { getGroup } from '@/app/lib/groups'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shadcn/components/ui/card'
 import { Badge } from '@/shadcn/components/ui/badge'
@@ -148,7 +147,7 @@ export default async function BudgetDetailPage({ searchParams }: Props) {
         <div className="flex-1">
           <h1 className="text-3xl font-bold">{budget.category || 'General Budget'}</h1>
           <p className="mt-1 text-muted-foreground">
-            {budget.period} • Created {new Date(budget.createdAt).toLocaleDateString()}
+            {budget.period} • Created {new Date(budget.createdAt).toLocaleDateString('es-ES')}
           </p>
         </div>
         <div className="flex gap-2">
@@ -252,7 +251,7 @@ export default async function BudgetDetailPage({ searchParams }: Props) {
                     You&apos;ve used all {chartResult.limit} charts available for your {chartResult.plan} plan this month.
                   </p>
                   <p className="text-sm text-amber-600 dark:text-amber-500">
-                    Resets: {new Date(chartResult.resetAt).toLocaleDateString('en-US', {
+                    Resets: {new Date(chartResult.resetAt).toLocaleDateString('es-ES', {
                       day: 'numeric',
                       month: 'long',
                       year: 'numeric',
