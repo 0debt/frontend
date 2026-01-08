@@ -14,7 +14,7 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN bun run build
+RUN --mount=type=cache,target=/app/.next/cache bun run build
 
 # Fase 4: Ejecución en producción con Bun
 FROM base AS runner
