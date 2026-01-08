@@ -98,7 +98,7 @@ export function NotificationPreferencesModal({
         }
       }, 1500);
       
-    } catch (error) {
+    } catch {
       alert('An error occurred while saving your preferences. Please try again.');
     } finally {
         setSaving(false);

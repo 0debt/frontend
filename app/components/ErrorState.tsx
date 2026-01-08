@@ -26,7 +26,7 @@ export default function Error({
       </div>
       <h1 className="text-2xl font-bold mb-2">Oops! Something went wrong</h1>
       <p className="text-muted-foreground mb-8 max-w-md">
-        An error occurred while processing your request. Please try again or refresh the page.
+        {message}
       </p>
       <div className="flex gap-4">
         <Button onClick={() => reset()} variant="default">
