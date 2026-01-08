@@ -132,7 +132,7 @@ export function NotificationBell() {
                       {n.read && <Check className="h-3 w-3 text-muted-foreground mt-1" />}
                   </div>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    {new Date(n.createdAt).toLocaleDateString()}
+                    {new Date(n.createdAt).toLocaleDateString('es-ES')}
                   </p>
                   {!n.read && (
                     <span className="absolute left-0 top-0 bottom-0 w-1 bg-blue-500 rounded-r-full" />
