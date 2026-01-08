@@ -40,7 +40,7 @@ type ExpenseListProps = {
 export function ExpenseList({ expenses, members, groupId }: ExpenseListProps) {
   // Agrupar gastos por fecha
   const groupedExpenses = expenses.reduce((acc, expense) => {
-    const dateKey = new Date(expense.date).toLocaleDateString('en-US', {
+    const dateKey = new Date(expense.date).toLocaleDateString('es-ES', {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
