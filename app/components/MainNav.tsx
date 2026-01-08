@@ -38,8 +38,10 @@ export function MainNav({ isAuthenticated }: MainNavProps) {
             key={item.href}
             href={item.href}
             className={cn(
-              'text-sm font-medium transition-colors hover:text-primary',
-              isActive ? 'text-foreground' : 'text-muted-foreground'
+              'text-sm font-medium transition-colors rounded-full px-4 py-2',
+              isActive 
+                ? 'bg-muted text-white' 
+                : 'text-muted-foreground hover:bg-primary hover:text-black'
             )}
           >
             {item.label}
