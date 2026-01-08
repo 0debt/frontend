@@ -6,6 +6,8 @@ import { Card, CardDescription, CardHeader, CardTitle } from "@/shadcn/component
 import { redirect } from "next/navigation"
 import { ProfileActions } from "./ProfileActions"
 
+import Image from "next/image"
+
 type User = {
   _id: string
   name: string
@@ -75,10 +77,12 @@ export default async function ProfilePage() {
               </div>
             </div>
 
-            <img
+            <Image
               src={user.avatar}
               alt={user.name}
-              className="w-20 h-20 rounded-full border shadow-sm"
+              width={80}
+              height={80}
+              className="rounded-full border shadow-sm"
             />
           </div>
 
