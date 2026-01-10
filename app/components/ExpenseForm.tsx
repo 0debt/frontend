@@ -277,7 +277,7 @@ export function ExpenseForm({ groupId, members, currentUserId, initialData, onSu
               }`}
             >
               <Avatar className="h-8 w-8">
-                <AvatarImage src={getUserAvatar(member._id, members)} alt={member.name} />
+                <AvatarImage src={getUserAvatar(member._id, members)} alt={member.name} draggable={false} />
                 <AvatarFallback>{member.name[0]?.toUpperCase()}</AvatarFallback>
               </Avatar>
               <span className="font-medium">{member.name}</span>
@@ -343,7 +343,7 @@ export function ExpenseForm({ groupId, members, currentUserId, initialData, onSu
                     {isSelected && <Check className="h-3 w-3 text-primary-foreground" />}
                   </div>
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={getUserAvatar(member._id, members)} alt={member.name} />
+                    <AvatarImage src={getUserAvatar(member._id, members)} alt={member.name} draggable={false} />
                     <AvatarFallback>{member.name[0]?.toUpperCase()}</AvatarFallback>
                   </Avatar>
                   <span className="font-medium">{member.name}</span>

@@ -74,7 +74,18 @@ async function getChartUrl(budgetId: string): Promise<ChartResult> {
       type: 'pie',
       data: {
         labels: ['Food', 'Transport', 'Other'],
-        datasets: [{ data: [80, 40, 30] }]
+        datasets: [{ 
+          data: [80, 40, 30],
+          backgroundColor: ['#2DD4BF', '#3B82F6', '#A855F7']
+        }]
+      },
+      options: {
+        legend: {
+          labels: { fontColor: 'white' }
+        },
+        plugins: {
+          datalabels: { color: 'white' }
+        }
       }
     }))
     return { type: 'success', url }
@@ -136,6 +147,15 @@ export default async function BudgetDetailPage({ searchParams }: Props) {
     }
   }
 
+  const getProgressColor = (health?: BudgetStatus['health']) => {
+    switch (health) {
+      case 'OK': return 'bg-primary'
+      case 'WARNING': return 'bg-secondary'
+      case 'OVERBUDGET': return 'bg-destructive'
+      default: return 'bg-primary'
+    }
+  }
+
   return (
     <div className="container mx-auto px-4 py-6 space-y-6">
       <div className="flex items-center gap-4">
@@ -182,7 +202,7 @@ export default async function BudgetDetailPage({ searchParams }: Props) {
                       {formatCurrency(status.spent)} / {formatCurrency(status.limit)}
                     </span>
                   </div>
-                  <Progress value={percentage} />
+                  <Progress value={percentage} indicatorClassName={getProgressColor(status.health)} />
                   <div className="flex justify-between text-xs text-muted-foreground">
                     <span>Remaining: {formatCurrency(status.limit - status.spent)}</span>
                     <span>{percentage.toFixed(1)}% used</span>
@@ -237,6 +257,7 @@ export default async function BudgetDetailPage({ searchParams }: Props) {
                 width={500}
                 height={300}
                 className="rounded-lg"
+                draggable={false}
               />
             </div>
           ) : chartResult.type === 'rate_limit' ? (

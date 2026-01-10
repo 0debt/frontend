@@ -208,7 +208,7 @@ export default async function SettleUpPage({ searchParams }: Props) {
                 {creditors.map(([userId, amount]) => (
                   <div key={userId} className="flex items-center gap-4 group">
                     <Avatar className="h-10 w-10 border-2 border-background ring-2 ring-green-100 dark:ring-green-900/20">
-                      <AvatarImage src={getUserAvatar(userId, members)} alt={getUserName(userId, members)} />
+                      <AvatarImage src={getUserAvatar(userId, members)} alt={getUserName(userId, members)} draggable={false} />
                       <AvatarFallback>{getUserName(userId, members)[0]?.toUpperCase()}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
@@ -250,7 +250,7 @@ export default async function SettleUpPage({ searchParams }: Props) {
                 {debtors.map(([userId, amount]) => (
                   <div key={userId} className="flex items-center gap-4 group">
                     <Avatar className="h-10 w-10 border-2 border-background ring-2 ring-red-100 dark:ring-red-900/20">
-                      <AvatarImage src={getUserAvatar(userId, members)} alt={getUserName(userId, members)} />
+                      <AvatarImage src={getUserAvatar(userId, members)} alt={getUserName(userId, members)} draggable={false} />
                       <AvatarFallback>{getUserName(userId, members)[0]?.toUpperCase()}</AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
@@ -288,7 +288,7 @@ export default async function SettleUpPage({ searchParams }: Props) {
                   {/* Debtor */}
                   <div className="flex-1 p-5 flex items-center gap-4 bg-red-50/30 dark:bg-red-900/5">
                     <Avatar className="h-12 w-12 border-2 border-white dark:border-gray-800 shadow-sm">
-                      <AvatarImage src={getUserAvatar(payment.from, members)} alt={getUserName(payment.from, members)} />
+                      <AvatarImage src={getUserAvatar(payment.from, members)} alt={getUserName(payment.from, members)} draggable={false} />
                       <AvatarFallback>{getUserName(payment.from, members)[0]?.toUpperCase()}</AvatarFallback>
                     </Avatar>
                     <div className="min-w-0">
@@ -314,7 +314,7 @@ export default async function SettleUpPage({ searchParams }: Props) {
                       <p className="font-bold truncate text-base">{getUserName(payment.to, members)}</p>
                     </div>
                     <Avatar className="h-12 w-12 border-2 border-white dark:border-gray-800 shadow-sm order-first sm:order-last">
-                      <AvatarImage src={getUserAvatar(payment.to, members)} alt={getUserName(payment.to, members)} />
+                      <AvatarImage src={getUserAvatar(payment.to, members)} alt={getUserName(payment.to, members)} draggable={false} />
                       <AvatarFallback>{getUserName(payment.to, members)[0]?.toUpperCase()}</AvatarFallback>
                     </Avatar>
                   </div>
@@ -349,7 +349,7 @@ export default async function SettleUpPage({ searchParams }: Props) {
             {settledUp.map(([userId]) => (
               <Badge key={userId} variant="secondary" className="pl-1 pr-3 py-1 bg-muted/50 text-muted-foreground font-medium border-none rounded-full flex items-center gap-2">
                 <Avatar className="h-5 w-5">
-                  <AvatarImage src={getUserAvatar(userId, members)} alt={getUserName(userId, members)} />
+                  <AvatarImage src={getUserAvatar(userId, members)} alt={getUserName(userId, members)} draggable={false} />
                   <AvatarFallback className="text-[10px]">{getUserName(userId, members)[0]?.toUpperCase()}</AvatarFallback>
                 </Avatar>
                 {getUserName(userId, members)}

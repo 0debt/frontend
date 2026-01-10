@@ -35,7 +35,7 @@ export default async function MarketingPage() {
         </h1>
         {user && (
           <Avatar className="h-10 w-10">
-            <AvatarImage src={user.avatar} alt={userName || 'User'} />
+            <AvatarImage src={user.avatar} alt={userName || 'User'} draggable={false} />
             <AvatarFallback>
               {(userName || 'U').charAt(0).toUpperCase()}
             </AvatarFallback>

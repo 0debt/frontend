@@ -134,7 +134,7 @@ function ExpenseItem({ expense, members, groupId }: ExpenseItemProps) {
         </div>
         <div className="flex items-center gap-2 mt-1">
           <Avatar className="h-4 w-4">
-            <AvatarImage src={payerAvatar} alt={payerName} />
+            <AvatarImage src={payerAvatar} alt={payerName} draggable={false} />
             <AvatarFallback className="text-[8px]">{payerName[0]?.toUpperCase()}</AvatarFallback>
           </Avatar>
           <p className="text-sm text-muted-foreground">

@@ -84,6 +84,7 @@ export default async function ProfilePage() {
               height={80}
               className="rounded-full border shadow-sm"
               unoptimized
+              draggable={false}
             />
           </div>
 

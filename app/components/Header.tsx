@@ -21,6 +21,7 @@ export function Header() {
             alt="0debt Logo"
             width={32}
             height={32}
+            draggable={false}
           />
         </Link>
         <div className="absolute left-1/2 -translate-x-1/2">
@@ -45,7 +46,7 @@ export function Header() {
             <Button variant="ghost" className="h-8 w-8 rounded-full" asChild>
               <Link href="/me">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src={user?.avatar} alt={user?.name || user?.email || 'User avatar'} />
+                  <AvatarImage src={user?.avatar} alt={user?.name || user?.email || 'User avatar'} draggable={false} />
                   <AvatarFallback>
                     {(user?.name || user?.email || 'U').charAt(0).toUpperCase()}
                   </AvatarFallback>

@@ -74,6 +74,7 @@ export async function updateBudget(
 ): Promise<BudgetActionState> {
   const limitAmount = formData.get('limitAmount') as string
   const groupId = formData.get('groupId') as string
+  const redirectUrl = formData.get('redirectUrl') as string
 
   if (!limitAmount) {
     return { error: 'Limit amount is required' }
@@ -97,6 +98,10 @@ export async function updateBudget(
     }
   } catch {
     return { error: 'Connection error. Please try again.' }
+  }
+
+  if (redirectUrl) {
+    redirect(redirectUrl)
   }
 
   if (groupId) {

@@ -76,6 +76,7 @@ export default async function GroupDetailPage({ params }: Props) {
               sizes="(max-width: 1200px) 100vw, 1200px"
               className="object-cover"
               priority
+              draggable={false}
             />
           </div>
         )}
@@ -129,7 +130,7 @@ export default async function GroupDetailPage({ params }: Props) {
               <div key={member._id} className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={member.avatar} alt={member.name} />
+                    <AvatarImage src={member.avatar} alt={member.name} draggable={false} />
                     <AvatarFallback>{member.name[0]?.toUpperCase()}</AvatarFallback>
                   </Avatar>
                   <span className="text-sm font-medium">{member.name}</span>

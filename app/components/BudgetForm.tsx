@@ -20,6 +20,7 @@ type BudgetFormProps = {
   budget?: Partial<Budget>
   mode: 'create' | 'edit'
   groups?: Group[]
+  redirectUrl?: string
 }
 
 const CATEGORIES = [
@@ -30,7 +31,7 @@ const CATEGORIES = [
   { value: 'OTHER', label: 'Other' },
 ]
 
-export function BudgetForm({ budget, mode, groups = [] }: BudgetFormProps) {
+export function BudgetForm({ budget, mode, groups = [], redirectUrl }: BudgetFormProps) {
   const action = mode === 'create' ? createBudget : (prevState: BudgetActionState, formData: FormData) =>
     updateBudget(budget?._id || '', prevState, formData)
 
@@ -52,6 +53,7 @@ export function BudgetForm({ budget, mode, groups = [] }: BudgetFormProps) {
       <CardContent>
         <form action={formAction} className="space-y-4">
           <input type="hidden" name="groupId" value={selectedGroup || budget?.groupId} />
+          {redirectUrl && <input type="hidden" name="redirectUrl" value={redirectUrl} />}
           {mode === 'create' && (
             <div className="space-y-2">
               <Label htmlFor="category">Category (optional)</Label>

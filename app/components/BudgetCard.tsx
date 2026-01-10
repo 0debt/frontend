@@ -35,6 +35,19 @@ export function BudgetCard({ budget, status, groupName }: BudgetCardProps) {
     }
   }
 
+  const getProgressColor = (health?: BudgetStatus['health']) => {
+    switch (health) {
+      case 'OK':
+        return 'bg-primary'
+      case 'WARNING':
+        return 'bg-secondary'
+      case 'OVERBUDGET':
+        return 'bg-destructive'
+      default:
+        return 'bg-primary'
+    }
+  }
+
   return (
     <Card className="hover:shadow-md transition-shadow">
       <CardHeader>
@@ -67,7 +80,7 @@ export function BudgetCard({ budget, status, groupName }: BudgetCardProps) {
                   {formatCurrency(status.spent)} / {formatCurrency(status.limit)}
                 </span>
               </div>
-              <Progress value={percentage} />
+              <Progress value={percentage} indicatorClassName={getProgressColor(status.health)} />
             </div>
           </div>
         )}
@@ -76,7 +89,7 @@ export function BudgetCard({ budget, status, groupName }: BudgetCardProps) {
             <Link href={`/budgets/view?budgetId=${budget._id}&groupId=${budget.groupId}`}>View</Link>
           </Button>
           <Button asChild variant="ghost" size="sm">
-            <Link href={`/budgets/edit?budgetId=${budget._id}&groupId=${budget.groupId}`}>Edit</Link>
+            <Link href={`/budgets/edit?budgetId=${budget._id}&groupId=${budget.groupId}&redirectUrl=${encodeURIComponent(`/budgets?group=${budget.groupId}`)}`}>Edit</Link>
           </Button>
           <DeleteBudgetButton 
             budgetId={budget._id} 
