@@ -15,7 +15,11 @@ export function Header() {
   return (
     <header className="border-b">
       <div className="container mx-auto relative flex h-16 items-center px-4">
-        <Link href="/" className="flex items-center gap-2">
+        <Link 
+          href="/" 
+          className="flex items-center gap-2"
+          onClick={() => window.dispatchEvent(new CustomEvent('refresh-notifications'))}
+        >
           <Image
             src="/0debt-logo.svg"
             alt="0debt Logo"
@@ -44,7 +48,10 @@ export function Header() {
             <NotificationBell />
             
             <Button variant="ghost" className="h-8 w-8 rounded-full" asChild>
-              <Link href="/me">
+              <Link 
+                href="/me"
+                onClick={() => window.dispatchEvent(new CustomEvent('refresh-notifications'))}
+              >
                 <Avatar className="h-8 w-8">
                   <AvatarImage src={user?.avatar} alt={user?.name || user?.email || 'User avatar'} draggable={false} />
                   <AvatarFallback>

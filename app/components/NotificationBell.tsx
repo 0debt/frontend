@@ -20,7 +20,19 @@ export function NotificationBell() {
   // Load notifications only when user changes (not on popover open/close)
   useEffect(() => {
     if (!user?.id) return;
-    getNotifications(user.id).then(setNotifications);
+    
+    const fetchNotifications = () => getNotifications(user.id).then(setNotifications);
+    
+    // Initial fetch
+    fetchNotifications();
+
+    // Listen for manual refresh events
+    const handleRefresh = () => fetchNotifications();
+    window.addEventListener('refresh-notifications', handleRefresh);
+
+    return () => {
+      window.removeEventListener('refresh-notifications', handleRefresh);
+    };
   }, [user?.id]);
 
   // Handle popover open/close - only reload when opening

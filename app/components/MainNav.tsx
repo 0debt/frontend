@@ -37,6 +37,7 @@ export function MainNav({ isAuthenticated }: MainNavProps) {
           <Link
             key={item.href}
             href={item.href}
+            onClick={() => window.dispatchEvent(new CustomEvent('refresh-notifications'))}
             className={cn(
               'text-sm font-medium transition-colors rounded-full px-4 py-2',
               isActive 
